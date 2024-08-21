@@ -5,10 +5,14 @@
 <head>
 <meta charset="UTF-8">
 <title layout:fragment="title">Nestify</title>
+<th:block th:fragment="extraStyles">
+    <link rel="stylesheet" th:href="@{/css/main/main.css}">
+</th:block>
 </head>
 <body>
-	<div layout:fragment="content">
-		<h1>메인 콘텐츠</h1>
+	<div layout:fragment="content" class="content-center">
+		<h1>Nestify</h1>
+		<p>Organize your own nest</p>
 	</div>
 </body>
 </html>

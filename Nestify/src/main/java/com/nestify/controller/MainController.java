@@ -1,7 +1,6 @@
 package com.nestify.controller;
 
 import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 
 import lombok.RequiredArgsConstructor;
@@ -18,8 +17,12 @@ public class MainController {
 	}
 	
 	@GetMapping("/main")
-	public String main(Model model) {
-		log.debug("<<main 컨트롤러 진입>>");
+	public String main() {
 		return "main/main";
+	}
+	
+	@GetMapping("/signup")
+	public String signupForm() {
+		return "main/signup";
 	}
 }

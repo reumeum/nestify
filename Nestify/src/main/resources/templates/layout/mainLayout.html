@@ -2,8 +2,9 @@
 <html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
 <head>
     <meta charset="UTF-8">
-    <title>My Application - <span layout:fragment="title">Default Title</span></title>
-    <!-- <link rel="stylesheet" th:href="@{/css/styles.css}"> -->
+    <title>My Application - <span layout:fragment="title">Nestify</span></title>
+    <link rel="stylesheet" th:href="@{/css/common.css}">
+    <th:block th:replace="~{::extraStyles}"></th:block>
 </head>
 <body>
 
@@ -13,7 +14,7 @@
     </header>
 
     <!-- Main Content Section -->
-    <main>
+    <main class="container">
         <div layout:fragment="content">
             <!-- 페이지별로 이곳에 콘텐츠가 들어갑니다 -->
         </div>
