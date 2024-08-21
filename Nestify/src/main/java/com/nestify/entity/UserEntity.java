@@ -9,14 +9,20 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
+import jakarta.persistence.UniqueConstraint;
 import lombok.AccessLevel;
 import lombok.Builder;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
 
 @ToString
 @Entity
-@Table(name = "\"user\"")
+@Getter
+@Table(name = "\"user\"", uniqueConstraints = {
+	    @UniqueConstraint(columnNames = {"username"}),
+	    @UniqueConstraint(columnNames = {"email"})
+	})
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class UserEntity implements Serializable {
 	
@@ -25,8 +31,13 @@ public class UserEntity implements Serializable {
 	@Column(name = "user_id")
 	private long userId;
 	
+	@Column(name = "username", nullable = false, length = 50)
 	private String username;
+	
+	@Column(name = "password", nullable = false, length = 100)
 	private String password;
+	
+	@Column(name = "email", nullable = false, length = 100)
 	private String email;
 	
     // 기본값 설정

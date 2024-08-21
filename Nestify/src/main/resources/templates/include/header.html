@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="UTF-8">
+<title>Insert title here</title>
+</head>
+<body>
+	<div style="background-color:gray; height: 100px;" th:fragment="header">
+		<h1>Nestify</h1>
+	    <nav>
+	        <ul>
+	            <li><a th:href="@{/}">Home</a></li>
+	            <li><a th:href="@{/about}">About</a></li>
+	            <li><a th:href="@{/contact}">Contact</a></li>
+	        </ul>
+	    </nav>
+	</div>
+</body>
+</html>

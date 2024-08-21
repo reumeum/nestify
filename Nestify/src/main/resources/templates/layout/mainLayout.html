@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
+<head>
+    <meta charset="UTF-8">
+    <title>My Application - <span layout:fragment="title">Default Title</span></title>
+    <!-- <link rel="stylesheet" th:href="@{/css/styles.css}"> -->
+</head>
+<body>
+
+    <!-- Header Section -->
+    <header>
+    	<th:block th:replace="include/header :: header"></th:block>
+    </header>
+
+    <!-- Main Content Section -->
+    <main>
+        <div layout:fragment="content">
+            <!-- 페이지별로 이곳에 콘텐츠가 들어갑니다 -->
+        </div>
+    </main>
+
+    <!-- Footer Section -->
+    <footer>
+        <p>&copy; 2024 My Application. All rights reserved.</p>
+    </footer>
+
+</body>
+</html>
