@@ -1,25 +1,24 @@
-const signup = async (event) => {
-	event.preventDefault(); // 기본 폼 제출 방지
-	
+const signup = (event) => {
+    event.preventDefault(); // 기본 폼 제출 방지
+
     const userData = {
-        username: document.getElementById('username').value,
-        email: document.getElementById('email').value,
-        password: document.getElementById('password').value
+        username: $('#username').val(),
+        email: $('#email').val(),
+        password: $('#password').val()
     };
 
-    const response = await fetch('/api/v1/user', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json'
+    $.ajax({
+        url: '/api/v1/user',
+        type: 'POST',
+        contentType: 'application/json',
+        data: JSON.stringify(userData),
+        success: function(response) {
+            alert('Signup successful!');
+            // 로그인 페이지로 리다이렉트
+            window.location.href = '/signin';
         },
-        body: JSON.stringify(userData)
+        error: function(xhr, status, error) {
+            alert('Signup failed.');
+        }
     });
-
-    if (response.ok) {
-        alert('Signup successful!');
-        // 로그인 페이지로 리다이렉트
-        window.location.href = '/signin';
-    } else {
-        alert('Signup failed.');
-    }
 };

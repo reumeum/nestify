@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="UTF-8">
+<title>Insert title here</title>
+</head>
+<body>
+	<div th:fragment="sidebar">
+		<div class="sidebar">
+			<div class="flex-between">
+				<div class="username" th:text="${user.username}"></div>
+				<svg class="w-6 h-6 text-gray-800 dark:text-white open-modal-btn" aria-hidden="true"
+					xmlns="http://www.w3.org/2000/svg" width="24" height="24"
+					fill="none" viewBox="0 0 24 24">
+	  					<path stroke="currentColor" stroke-linecap="round"
+						stroke-linejoin="round" stroke-width="2" d="M5 12h14m-7 7V5" />
+				</svg>
+	
+			</div>
+			<ul class="menu">
+				<li><a href="#">Home</a></li>
+				<li><a href="#">Collections</a></li>
+				<li><a href="#">Favorites</a></li>
+				<li><a href="#">Tags</a></li>
+				<li><a href="#">Settings</a></li>
+			</ul>
+			
+			<!-- 모달 창 -->
+		    <div id="modal" class="modal">
+		        <div class="modal-content">
+		            <h2>New Collection</h2>
+		            <input type="color" id="colorPicker">
+		            <div>
+		            	<input type="text" id="collectionName" placeholder="collection name" class="modal-input-style"/>            
+		            </div>
+		            <div>
+		            	<textarea id="collectionDescription" rows="5" cols="10" placeholder="description" class="modal-input-style"></textarea>
+		            </div>
+		            <button class="basic-btn" id="addCollectionBtn">Add</button>
+		            <button class="close-btn">Close</button>
+		        </div>
+		    </div>
+		    <script type="text/javascript" src="js/nest/dashboard.js"></script>
+		</div>
+	</div>
+</body>
+</html>

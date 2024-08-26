@@ -1,7 +1,6 @@
 package com.nestify.service.impl;
 
 import java.util.List;
-import java.util.Optional;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -50,7 +49,7 @@ public class UserServiceImpl implements UserService {
 	 * 사용자 삭제
 	 */
 	@Override
-	public void deleteUserByUserId(long userId) {
+	public void deleteUserByUserId(Long userId) {
 		userJpaRepository.deleteById(userId);
 	}
 
@@ -60,11 +59,9 @@ public class UserServiceImpl implements UserService {
 	@Override
     public boolean authenticate(String email, String password) {
         // 데이터베이스에서 사용자 조회
-        Optional<UserEntity> userOptional = userJpaRepository.findByEmail(email);
+        UserEntity user = userJpaRepository.findByEmail(email);
 
-        if (userOptional.isPresent()) {
-            UserEntity user = userOptional.get();
-            // 비밀번호 검증
+        if (user != null) {
             return user.getPassword().equals(password);
         }
 
@@ -73,7 +70,7 @@ public class UserServiceImpl implements UserService {
     }
 
 	@Override
-	public Optional<UserEntity> findByEmail(String email) {
+	public UserEntity findByEmail(String email) {
 		return userJpaRepository.findByEmail(email);
 	}
 	

@@ -47,7 +47,7 @@ public class UserRestController {
 	 * 사용자 삭제
 	 */
 	@DeleteMapping("/api/v1/user")
-	public ResponseEntity<Object> deleteUser(@RequestParam("userId") long userId) {
+	public ResponseEntity<Object> deleteUser(@RequestParam("userId") Long userId) {
 		userService.deleteUserByUserId(userId);
 		return new ResponseEntity<>(HttpStatus.OK);
 	}

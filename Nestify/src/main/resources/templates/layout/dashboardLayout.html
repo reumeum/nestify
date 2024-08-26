@@ -2,29 +2,29 @@
 <html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
 <head>
     <meta charset="UTF-8">
-    <title>My Application - <span layout:fragment="title">Nestify</span></title>
+    <title>Dashboard - <span layout:fragment="title"></span></title>
     <link rel="stylesheet" th:href="@{/css/common.css}">
     <th:block th:replace="~{::extraStyles}"></th:block>
     <script src="https://code.jquery.com/jquery-latest.min.js"></script>
+	<script th:inline="javascript">
+	    const userId = '[[${session.user.userId}]]';
+	</script>
+
+
 </head>
 <body>
 
-    <!-- Header Section -->
-    <header>
-    	<th:block th:replace="main/include/header :: header"></th:block>
-    </header>
+    <!-- Sidebar Section -->
+    <nav>
+    	<th:block th:replace="nest/include/sidebar :: sidebar"></th:block>    
+    </nav>
 
     <!-- Main Content Section -->
-    <main class="container">
+    <main class="main-content">
         <div layout:fragment="content">
             <!-- 페이지별로 이곳에 콘텐츠가 들어갑니다 -->
         </div>
     </main>
-
-    <!-- Footer Section -->
-    <footer>
-        <p>&copy; 2024 My Application. All rights reserved.</p>
-    </footer>
 
 </body>
 </html>

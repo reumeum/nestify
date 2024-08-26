@@ -29,7 +29,7 @@ public class UserEntity implements Serializable {
 	@Id
 	@GeneratedValue(strategy = GenerationType.AUTO)
 	@Column(name = "user_id")
-	private long userId;
+	private Long userId;
 	
 	@Column(name = "username", nullable = false, length = 50)
 	private String username;
@@ -45,7 +45,7 @@ public class UserEntity implements Serializable {
     private LocalDateTime updated_at = LocalDateTime.now();
 	
 	@Builder(toBuilder = true)
-	public UserEntity(long userId, String username, String password, String email, LocalDateTime created_at, LocalDateTime updated_at) {
+	public UserEntity(Long userId, String username, String password, String email, LocalDateTime created_at, LocalDateTime updated_at) {
 		this.userId = userId;
 		this.username = username;
 		this.password = password;

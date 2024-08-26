@@ -52,7 +52,7 @@ public class MainController {
 
 		if (isAuthenticated) {
 			// 인증이 성공한 경우: 홈 페이지 또는 대시보드로 리다이렉트
-	        Optional<UserEntity> user = userService.findByEmail(email);
+	        UserEntity user = userService.findByEmail(email);
 	        session.setAttribute("user", user);
 	        
 	        log.debug("<<로그인 성공>> : " + user);
