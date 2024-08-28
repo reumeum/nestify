@@ -7,8 +7,13 @@
 <body>
 	<div th:fragment="sidebar">
 		<div class="sidebar">
-			<div class="flex-between">
-				<div class="username" th:text="${user.username}"></div>
+			<div class="flex-between sidebar-header">
+				<div class="flex">
+					<div class="username" th:text="${user.username}"></div>
+					<svg class="w-6 h-6 text-gray-800 dark:text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24">
+	  					<path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m8 10 4 4 4-4"/>
+					</svg>
+				</div>
 				<svg class="w-6 h-6 text-gray-800 dark:text-white open-modal-btn" aria-hidden="true"
 					xmlns="http://www.w3.org/2000/svg" width="24" height="24"
 					fill="none" viewBox="0 0 24 24">
@@ -18,10 +23,23 @@
 	
 			</div>
 			<ul class="menu">
-				<li><a href="#">Home</a></li>
-				<li><a href="#">Collections</a></li>
+				<li class="flex no-margin-bottom">
+					<svg class="w-6 h-6 text-gray-800 dark:text-white menu-icon" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" viewBox="0 0 24 24">
+  						<path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.4" d="m17 21-5-4-5 4V3.889a.92.92 0 0 1 .244-.629.808.808 0 0 1 .59-.26h8.333a.81.81 0 0 1 .589.26.92.92 0 0 1 .244.63V21Z"/>
+					</svg>
+					<a href="/dashboard">All Bookmarks</a>
+				</li>
+				<li class="flex">
+					<svg class="w-[22px] h-[22px] text-gray-800 dark:text-white menu-icon" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" viewBox="0 0 24 24">
+  						<path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.4" d="M4 13h3.439a.991.991 0 0 1 .908.6 3.978 3.978 0 0 0 7.306 0 .99.99 0 0 1 .908-.6H20M4 13v6a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-6M4 13l2-9h12l2 9"/>
+					</svg>
+					<a href="/dashboard/-1">Unsorted</a>
+				</li>
+				<li class="no-hover">
+					<a href="#">Collections</a>
+					<ul class="submenu"></ul>
+				</li>
 				<li><a href="#">Favorites</a></li>
-				<li><a href="#">Tags</a></li>
 				<li><a href="#">Settings</a></li>
 			</ul>
 			
@@ -40,7 +58,7 @@
 		            <button class="close-btn">Close</button>
 		        </div>
 		    </div>
-		    <script type="text/javascript" src="js/nest/dashboard.js"></script>
+		    <script type="text/javascript" src="js/nest/sidebar.js"></script>
 		</div>
 	</div>
 </body>

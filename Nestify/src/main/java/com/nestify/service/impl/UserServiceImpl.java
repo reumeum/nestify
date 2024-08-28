@@ -13,6 +13,7 @@ import lombok.RequiredArgsConstructor;
 
 
 @Service
+@Transactional
 @RequiredArgsConstructor
 public class UserServiceImpl implements UserService {
 	

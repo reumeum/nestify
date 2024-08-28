@@ -12,18 +12,24 @@
 </head>
 <body>
 	<div layout:fragment="content">
-			<div class="header">
-				<input type="text" placeholder="Search..." class="search-bar">
-				<button class="profile-button">Profile</button>
-			</div>
-			<div class="grid-container">
-				<div class="grid-item">Item 1</div>
-				<div class="grid-item">Item 2</div>
-				<div class="grid-item">Item 3</div>
-				<div class="grid-item">Item 4</div>
-				<div class="grid-item">Item 5</div>
-				<div class="grid-item">Item 6</div>
-			</div>
+		<div class="header">
+			<input type="text" placeholder="Search..." class="search-bar">
+			<button class="add-button" id="open-bookmark-modal"><svg class="w-4 h-4 text-gray-800 dark:text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24">
+ 												<path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M5 12h14m-7 7V5"/>
+										</svg>
+			Add</button>
+		</div>
+		<div id="bookmarksList" class="bookmark-container">
+		</div>
+			
+        <!-- Bookmark 모달 구조 -->
+        <div class="bookmark-modal-content" id="bookmark-modal">
+            <label for="url">URL</label>
+            <input type="text" id="bookmark-url" placeholder="https://example.com">
+            <button id="add-to-unsorted" disabled="disabled">Add to Unsorted</button>
+        </div>
+	    <script type="text/javascript" src="js/nest/dashboard.js"></script>
+	    
 	</div>
 </body>
 </html>

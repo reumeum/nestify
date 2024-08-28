@@ -1,6 +1,8 @@
 package com.nestify.entity;
 
 import java.time.LocalDateTime;
+import java.util.HashSet;
+import java.util.Set;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
@@ -11,9 +13,10 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
+import jakarta.persistence.JoinTable;
+import jakarta.persistence.ManyToMany;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
-import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -25,7 +28,7 @@ import lombok.ToString;
 @Getter
 @Setter
 @Table(name="collection")
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@NoArgsConstructor
 public class CollectionEntity {
     
     @Id
@@ -39,7 +42,7 @@ public class CollectionEntity {
     @Column(name = "description", columnDefinition = "TEXT")
     private String description;
     
-    @Column(name = "color_code", nullable = false, length = 7)
+    @Column(name = "color_code", length = 7)
     private String colorCode;
     
     // 연관된 UserEntity 설정
@@ -51,6 +54,18 @@ public class CollectionEntity {
     // 기본값 설정
     private LocalDateTime created_at = LocalDateTime.now();
     private LocalDateTime updated_at = LocalDateTime.now();
+    
+    @Column(name = "is_system_collection", nullable = false)
+    private boolean isSystemCollection = false;
+    
+    @ManyToMany
+    @JsonIgnore
+    @JoinTable(
+        name = "collection_bookmark",
+        joinColumns = @JoinColumn(name = "collection_id"),
+        inverseJoinColumns = @JoinColumn(name = "bookmark_id")
+    )
+    private Set<BookmarkEntity> bookmarks = new HashSet<>();
     
     @Builder
     public CollectionEntity(String name, String description, String colorCode, UserEntity user, LocalDateTime created_at, LocalDateTime updated_at) {
