@@ -35,3 +35,5 @@ out/
 
 ### VS Code ###
 .vscode/
+
+Nestify/src/main/resources/config/application-nestify-local.yml
