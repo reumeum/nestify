@@ -1,9 +1,8 @@
 .main-content {
-	flex-grow: 1 !important;
-	display: flex;
-	flex-direction: column;
-	padding: 20px;
+  padding: 20px;
+  min-height: 100vh; /* 콘텐츠가 부족할 경우에도 최소한 화면 높이에 맞게 설정 */
 }
+
 
 .header {
 	display: flex;

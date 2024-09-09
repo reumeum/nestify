@@ -124,5 +124,14 @@ public class NestRestController {
         return new ResponseEntity<>(bookmarks, HttpStatus.OK);
     }
     
+    /*
+     * 북마크 삭제
+     */
+    @DeleteMapping("/api/v1/bookmark/{bookmarkId}")
+    public ResponseEntity<Object> deleteBookmarkByBookmarkId(@PathVariable("bookmarkId") Long bookmarkId) {
+        nestService.deleteBookmarkById(bookmarkId);
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
+    
     
 }
