@@ -262,11 +262,14 @@ public class NestServiceImpl implements NestService {
                 predicates.add(criteriaBuilder.equal(collectionBookmarksJoin.get("collection").get("collectionId"), collectionId));
             }
 
-			// 검색어가 있을 때 제목에서 검색
-			if (keyword != null && !keyword.isEmpty()) {
-			    predicates.add(criteriaBuilder.like(root.get("title"), "%" + keyword + "%"));
-			    log.debug("키워드 : " + keyword);
-			}
+            // 검색어가 있을 때 제목에서 대소문자 구분 없이 검색
+            if (keyword != null && !keyword.isEmpty()) {
+                predicates.add(criteriaBuilder.like(
+                    criteriaBuilder.lower(root.get("title")), 
+                    "%" + keyword.toLowerCase() + "%"
+                ));
+                log.debug("키워드 : " + keyword);
+            }
 			
             // 모든 조건을 AND로 결합
             return criteriaBuilder.and(predicates.toArray(new Predicate[0]));

@@ -10,6 +10,7 @@ $(document).ready(function() {
 	bindModalEvents();
 	bindBookmarkEvents();
 	bindFilterEvents();
+	searchEvents();
 });
 
 // 경로에 따른 처리 함수
@@ -67,13 +68,28 @@ function bindBookmarkEvents() {
 function bindFilterEvents() {
 	$('.filterbtn').on('click', showFilterContent);
 	$(document).on('click', closeFilterOnClickOutside);
-	$('input[name="sort"]').on('change', function() {
-		const path = window.location.pathname;
-		const segments = path.split('/');
-		const collectionId = segments[2] || 0;
-	
-		handleDashboardPaths(path, collectionId);
-	});
+	$('input[name="sort"]').on('change', performSearch);
+}
+
+function searchEvents() {
+    // 검색 버튼 클릭 시 검색 동작
+    $('#searchBtn').on('click', performSearch);
+
+    // Enter 키를 눌렀을 때도 검색 동작
+    $('input[name="keyword"]').on('keydown', function(event) {
+        if (event.key === 'Enter' || event.keyCode === 13) {
+            performSearch();
+        }
+    });
+}
+
+// 검색 수행 함수
+function performSearch() {
+    const path = window.location.pathname;
+    const segments = path.split('/');
+    const collectionId = segments[2] || 0;
+
+    handleDashboardPaths(path, collectionId);
 }
 
 // 모달 열기
@@ -222,12 +238,16 @@ function fetchBookmarks(endpoint, collectionName) {
 	// 라디오 버튼에서 sortBy와 desc 값을 가져옴
     const sortBy = $('input[name="sort"]:checked').val().split('-')[0]; // 정렬 필드 (예: "updated", "created", "title")
     const desc = $('input[name="sort"]:checked').val().split('-')[1] === 'desc'; // true 또는 false 값
+    const keyword = encodeURIComponent($('input[name="keyword"]').val().trim()); // 공백과 특수 문자를 인코딩
 
     // 쿼리스트링을 URL에 추가
-    const queryParams = `?sortBy=${sortBy}&desc=${desc}`;
-    const fullUrl = endpoint + queryParams;
+    let queryParams = `?sortBy=${sortBy}&desc=${desc}`;
     
-    console.log(fullUrl);
+    if (keyword != null && keyword != '') {
+		queryParams += `&keyword=${keyword}`
+	}
+    
+    let fullUrl = endpoint + queryParams;
 	
 	$.ajax({
 		url: fullUrl,
@@ -294,9 +314,6 @@ function getBookmarkForEdit(collectionId, bookmarkId) {
 			$('.edit-panel #url').val(bookmark.url);
 			$('.edit-panel #note').val(bookmark.note);
 			$('#saveBookmarkBtn').data('id', bookmarkId);
-
-			console.log("컬렉션 id : " + bookmark.collectionId);
-			console.log("isSystemCollection 값: ", bookmark.isSystemCollection);  // isSystemCollection 확인
 
 			if (bookmark.isSystemCollection == false) {
 				$('#collection').val(bookmark.collectionId).change();

@@ -1,6 +1,8 @@
 package com.nestify.controller;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -35,8 +37,17 @@ public class UserRestController {
 	 */
 	@PostMapping("/api/v1/user")
 	public ResponseEntity<Object> userSave(@RequestBody UserEntity userEntity) {
-		UserEntity result = userService.saveUser(userEntity);
-		return new ResponseEntity<>(result, HttpStatus.OK);
+		UserEntity existingUser = userService.findByEmail(userEntity.getEmail());
+		
+		if (existingUser != null) {
+	        Map<String, String> response = new HashMap<>();
+	        response.put("message", "User with this email already exists");
+	        return new ResponseEntity<>(response, HttpStatus.CONFLICT);
+		} else {
+			UserEntity result = userService.saveUser(userEntity);			
+			return new ResponseEntity<>(result, HttpStatus.OK);
+		}
+		
 	}
 
 	/*

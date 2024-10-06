@@ -1,6 +1,5 @@
 $(document).ready(function() {
 
-	console.log("userId : " + userId);
 	getCollectionsList();
 
 	/* 북마크 추가 모달 열기 */
