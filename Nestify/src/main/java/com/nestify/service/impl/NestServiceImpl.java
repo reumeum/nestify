@@ -1,17 +1,37 @@
 package com.nestify.service.impl;
 
+import java.io.IOException;
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
+import com.nestify.dto.BookmarkDTO;
+import com.nestify.dto.BookmarkForm;
+import com.nestify.dto.CollectionForm;
 import com.nestify.entity.BookmarkEntity;
+import com.nestify.entity.CollectionBookmark;
 import com.nestify.entity.CollectionEntity;
+import com.nestify.entity.UserEntity;
 import com.nestify.repository.BookmarkJpaRepository;
+import com.nestify.repository.CollectionBookmarkJpaRepository;
 import com.nestify.repository.CollectionJpaRepository;
 import com.nestify.repository.UserJpaRepository;
 import com.nestify.service.NestService;
+import com.nestify.util.FileUtil;
 
+import jakarta.persistence.criteria.Join;
+import jakarta.persistence.criteria.Predicate;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
@@ -25,6 +45,7 @@ public class NestServiceImpl implements NestService {
 	private final UserJpaRepository userJpaRepository;
 	private final CollectionJpaRepository collectionJpaRepository;
 	private final BookmarkJpaRepository bookmarkJpaRepository;
+	private final CollectionBookmarkJpaRepository collectionBookmarkJpaRepository;
 
 	/*
 	 * 사용자별 컬렉션 리스트 조회
@@ -53,10 +74,28 @@ public class NestServiceImpl implements NestService {
 	 * 컬렉션 수정
 	 */
 	@Override
-	public CollectionEntity updateCollection(CollectionEntity collectionEntity) {
-		// TODO Auto-generated method stub
-		return null;
-	}
+	@Transactional
+	public CollectionEntity updateCollection(CollectionForm collectionForm, UserEntity user) {
+		
+        CollectionEntity collectionEntity = collectionJpaRepository.findById(collectionForm.getCollectionId())
+        	.orElseThrow(() -> new RuntimeException("Collection not found with id: " + collectionForm.getCollectionId()));
+
+        // 필드 업데이트
+        collectionEntity.setCollectionId(collectionForm.getCollectionId());
+        collectionEntity.setName(collectionForm.getName());
+        collectionEntity.setColorCode(collectionForm.getColorCode());
+        collectionEntity.setDescription(collectionForm.getDescription());
+        collectionEntity.setUser(user);
+        	
+
+        // updated_at 필드 갱신
+        collectionEntity.setUpdatedAt(LocalDateTime.now());
+        
+        log.debug("컬렉션 수정 : " + collectionEntity);
+
+        // 저장
+        return collectionJpaRepository.save(collectionEntity);
+    }
 
 	/*
 	 * 컬렉션 삭제
@@ -67,29 +106,8 @@ public class NestServiceImpl implements NestService {
 	}
 
 	/*
-	 * 모든 북마크 리스트
+	 * 북마크 등록
 	 */
-	@Override
-	public List<BookmarkEntity> getBookmarksByUserId(Long userId) {
-		return bookmarkJpaRepository.findByUser_UserId(userId);
-	}
-
-	/*
-	 * 컬렉션별 북마크 리스트
-	 */
-	@Override
-	public List<BookmarkEntity> getBookmarksByCollectionId(Long collectionId) {
-		return bookmarkJpaRepository.findByCollections_CollectionId(collectionId);
-	}
-
-	/*
-	 * favorite 북마크 리스트
-	 */
-	@Override
-	public List<BookmarkEntity> getFavoriteBookmarksByUserId(Long userId) {
-		return bookmarkJpaRepository.findByUser_UserIdAndIsFavoriteTrue(userId);
-	}
-
 	@Override
 	public BookmarkEntity saveBookmark(BookmarkEntity bookmark, Long collectionId, Long userId) {
 		CollectionEntity collection;
@@ -103,10 +121,13 @@ public class NestServiceImpl implements NestService {
 					.orElseThrow(() -> new RuntimeException("Collection not found"));
 		}
 
-		collection.getBookmarks().add(bookmark);
+		CollectionBookmark collectionBookmark = new CollectionBookmark();
+		collectionBookmark.setBookmark(bookmark);
+		collectionBookmark.setCollection(collection);
 
 		bookmarkJpaRepository.save(bookmark);
 		collectionJpaRepository.save(collection);
+		collectionBookmarkJpaRepository.save(collectionBookmark);
 
 		return bookmark;
 	}
@@ -119,24 +140,166 @@ public class NestServiceImpl implements NestService {
 		return collectionJpaRepository.save(unsorted);
 	}
 
+	/*
+	 * 북마크 수정
+	 */
 	@Override
-	public BookmarkEntity updateBookmark(BookmarkEntity bookmarkEntity) {
-		// TODO Auto-generated method stub
-		return null;
+	@Transactional
+    public BookmarkEntity updateBookmark(BookmarkForm bookmarkForm, UserEntity user) {
+        BookmarkEntity bookmarkEntity = bookmarkJpaRepository.findById(bookmarkForm.getBookmarkId())
+            .orElseThrow(() -> new RuntimeException("Bookmark not found with id: " + bookmarkForm.getBookmarkId()));
+
+        // 필드 업데이트
+        bookmarkEntity.setTitle(bookmarkForm.getTitle());
+        bookmarkEntity.setUrl(bookmarkForm.getUrl());
+        bookmarkEntity.setNote(bookmarkForm.getNote());
+        bookmarkEntity.setUser(user);
+        
+        // 기존 컬렉션을 명시적으로 제거
+        for (CollectionBookmark collectionBookmark : bookmarkEntity.getCollectionBookmarks()) {
+            collectionBookmarkJpaRepository.delete(collectionBookmark); // CollectionBookmark 삭제
+        }
+        
+        bookmarkEntity.getCollectionBookmarks().clear();  // 관계를 제거
+
+        // 컬렉션 업데이트
+        List<Long> collectionIds = bookmarkForm.getCollectionId();
+        List<CollectionEntity> collections = new ArrayList<CollectionEntity>();
+        
+        log.debug("collection Id (Form) : " + bookmarkForm.getCollectionId());
+        
+        if (bookmarkForm.getCollectionId().stream().findFirst().orElse((long) 0) == 0) {
+        	CollectionEntity unsortedCollection = collectionJpaRepository.findByUser_UserIdAndIsSystemCollectionTrue(user.getUserId())
+        			.orElseThrow(() -> new RuntimeException("Collection not found!"));
+        	collections.add(unsortedCollection);
+        } else {
+        	collections = getCollectionsByIds(collectionIds);
+        }
+        
+        Set<CollectionBookmark> collectionBookmarks = new HashSet<CollectionBookmark>();
+        for (CollectionEntity collection : collections) {
+        	CollectionBookmark collectionBookmark = new CollectionBookmark();
+        	collectionBookmark.setBookmark(bookmarkEntity);
+        	collectionBookmark.setCollection(collection);
+        	collectionBookmarks.add(collectionBookmark);
+        	
+            // 새로 추가된 CollectionBookmark 엔티티 저장
+            collectionBookmarkJpaRepository.save(collectionBookmark);
+        	
+        	log.debug("북마크 수정 컬렉션 목록 : " + collection);
+        }
+
+        // 커버 이미지 처리
+        MultipartFile coverImg = bookmarkForm.getCoverImg();
+        if (coverImg != null && !coverImg.isEmpty()) {
+            try {
+                bookmarkEntity.setCoverImgUrl(FileUtil.saveCoverImg(coverImg, user.getUserId()));
+            } catch (IOException e) {
+                throw new RuntimeException("Failed to save cover image", e);
+            }
+        }
+
+        // updated_at 필드 갱신
+        bookmarkEntity.setUpdatedAt(LocalDateTime.now());
+        
+        log.debug("북마크 수정 : " + bookmarkEntity);
+
+        // 저장
+        return bookmarkJpaRepository.save(bookmarkEntity);
+    }
+
+	@Override
+	public List<CollectionEntity> getCollectionsByIds(List<Long> collectionIds) {
+		return collectionJpaRepository.findAllById(collectionIds);
 	}
+	
+	@Override
+	public Optional<CollectionEntity> getCollectionById(Long collectionId) {
+		return collectionJpaRepository.findById(collectionId);
+	}
+
 
 	@Override
 	public void deleteBookmarkById(Long bookmarkId) {
 		Optional<BookmarkEntity> optionalBookmark = bookmarkJpaRepository.findById(bookmarkId);
 
 		if (optionalBookmark.isPresent()) {
-			BookmarkEntity bookmark = optionalBookmark.get();
-			for (CollectionEntity collection : bookmark.getCollections()) {
-				collection.getBookmarks().remove(bookmark);
-				collectionJpaRepository.save(collection);
-			}
-
 			bookmarkJpaRepository.deleteById(bookmarkId);
 		}
 	}
+
+	@Override
+	public BookmarkDTO getBookmarkByBookmarkId(Long bookmarkId) {
+		
+		BookmarkEntity bookmark = bookmarkJpaRepository.findById(bookmarkId)
+				.orElseThrow(() -> new RuntimeException("Bookmark not found"));
+		
+		BookmarkDTO bookmarkDTO = new BookmarkDTO(bookmark);
+
+		return bookmarkDTO;
+	}
+
+	@Override
+	public Page<BookmarkDTO> searchBookmarks(Long userId, Long collectionId, String keyword, int page, int size, String sortBy, boolean desc) {
+        Pageable pageable = PageRequest.of(page, size, Sort.by(desc ? Sort.Direction.DESC : Sort.Direction.ASC, sortBy));
+
+        // 동적 검색을 위한 Specification 생성
+        Specification<BookmarkEntity> spec = (root, query, criteriaBuilder) -> {
+            // 조인을 통해 컬렉션 접근 (bookmark와 collectionBookmarks 사이에 JOIN을 수행)
+            Join<Object, Object> collectionBookmarksJoin = root.join("collectionBookmarks");
+        	
+            List<Predicate> predicates = new ArrayList<>();
+
+            // userId가 있을 때 사용자 필터링
+            if (userId != null) {
+                predicates.add(criteriaBuilder.equal(root.get("user").get("userId"), userId));
+            }
+
+            // collectionId가 있을 때 컬렉션 필터링
+            if (collectionId != null && collectionId == -1) {
+            	predicates.add(criteriaBuilder.equal(collectionBookmarksJoin.get("collection").get("isSystemCollection"), true));
+            } else if (collectionId != null) {
+                predicates.add(criteriaBuilder.equal(collectionBookmarksJoin.get("collection").get("collectionId"), collectionId));
+            }
+
+			// 검색어가 있을 때 제목에서 검색
+			if (keyword != null && !keyword.isEmpty()) {
+			    predicates.add(criteriaBuilder.like(root.get("title"), "%" + keyword + "%"));
+			    log.debug("키워드 : " + keyword);
+			}
+			
+            // 모든 조건을 AND로 결합
+            return criteriaBuilder.and(predicates.toArray(new Predicate[0]));
+        };
+
+        // 조건에 맞는 결과를 페이징 처리하여 반환
+        return bookmarkJpaRepository.findAll(spec, pageable)
+        		.map(bookmarkEntity -> convertToDTO(bookmarkEntity));
+    }
+	
+	public BookmarkDTO convertToDTO(BookmarkEntity bookmark) {
+	    // DTO로 변환
+	    BookmarkDTO dto = new BookmarkDTO();
+	    dto.setBookmarkId(bookmark.getBookmarkId());
+	    dto.setTitle(bookmark.getTitle());
+	    dto.setUrl(bookmark.getUrl());
+	    dto.setCoverImgUrl(bookmark.getCoverImgUrl());
+	    dto.setNote(bookmark.getNote());
+	    dto.setCreatedAt(bookmark.getCreatedAt());
+	    dto.setUpdatedAt(bookmark.getUpdatedAt());
+
+	    // Collection 정보가 있는 경우, 첫 번째 Collection 정보를 DTO에 설정
+	    bookmark.getCollectionBookmarks().stream().findFirst().ifPresent(cb -> {
+	        dto.setCollectionId(cb.getCollection().getCollectionId());
+	        dto.setCollectionName(cb.getCollection().getName());
+	        dto.setSystemCollection(cb.getCollection().isSystemCollection());
+	        dto.setCollectionColorCode(cb.getCollection().getColorCode());
+	    });
+
+	    return dto;
+	}
+
+
+
+
 }

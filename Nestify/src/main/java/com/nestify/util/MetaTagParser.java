@@ -143,10 +143,10 @@ public class MetaTagParser {
 
 
             // 스크린샷을 저장할 상대 경로 설정 (웹에서 접근 가능한 경로)
-            relativePath = "images/" + userId + "/screenshots/" + filename;
+            relativePath = "/images/" + userId + "/screenshots/" + filename;
 
             // 절대 경로로 변환하여 파일을 저장할 경로 설정
-            screenshotPath = "src/main/resources/static/" + relativePath;
+            screenshotPath = "src/main/resources/static" + relativePath;
 
             // 스크린샷을 저장할 경로 설정
             Files.createDirectories(Paths.get("src/main/resources/static/images/" + userId + "/screenshots"));

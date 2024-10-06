@@ -14,11 +14,63 @@
 	<div layout:fragment="content">
 		<div class="header">
 			<input type="text" placeholder="Search..." class="search-bar">
-			<button class="add-button" id="open-bookmark-modal"><svg class="w-4 h-4 text-gray-800 dark:text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24">
- 												<path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M5 12h14m-7 7V5"/>
-										</svg>
-			Add</button>
+			<button class="add-button" id="open-bookmark-modal">
+			    <svg class="w-4 h-4 text-gray-800 dark:text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24">
+ 					<path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M5 12h14m-7 7V5"/>
+				</svg>
+				Add
+			</button>
 		</div>
+		
+		<script th:inline="javascript">
+		var collection = /*[[${collection ?: {}}]]*/ {}; // 기본값을 빈 객체로 설정
+		</script>
+		
+		<div class="flex-between">
+
+			<div id="selectedCollection">
+				<span id="selectedCollectionIcon"></span>
+				<div id="selectedCollectionName"></div>
+			</div>
+			
+			<!-- 정렬 필터 -->
+			<div class="filter-container">
+			    <button class="filterbtn">
+			        <svg class="icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" viewBox="0 0 24 24">
+			            <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 12h14M5 6h14M5 18h14" />
+			        </svg>
+			        Sort by
+			    </button>
+			    <div class="filter-content">
+			        <label>
+			            <input type="radio" name="sort" value="updatedAt-desc" checked>
+			            updated date (Newest)
+			        </label>
+			        <label>
+			            <input type="radio" name="sort" value="updatedAt-asc">
+			            updated date (Oldest)
+			        </label>
+			        <label>
+			            <input type="radio" name="sort" value="createdAt-desc">
+			            created date (Newest)
+			        </label>
+			        <label>
+			            <input type="radio" name="sort" value="createdAt-asc">
+			            created date (Oldest)
+			        </label>
+			        <label>
+			            <input type="radio" name="sort" value="title-asc">
+			            title (A-Z)
+			        </label>
+			        <label>
+			            <input type="radio" name="sort" value="title-desc">
+			            title (Z-A)
+			        </label>
+			    </div>
+			</div>
+		
+		</div>
+		
 		<div id="bookmarksList" class="bookmark-container">
 		</div>
 			
@@ -26,10 +78,10 @@
         <div class="bookmark-modal-content" id="bookmark-modal">
             <label for="url">URL</label>
             <input type="text" id="bookmark-url" placeholder="https://example.com">
-            <button id="add-to-unsorted" disabled="disabled">Add to Unsorted</button>
+            <button id="add-to" disabled="disabled">Add to Unsorted</button>
         </div>
-	    <script type="text/javascript" src="js/nest/dashboard.js"></script>
 	    
-	</div>
+	    <script type="text/javascript" src="/js/nest/dashboard.js"></script>
+	</div> 
 </body>
 </html>

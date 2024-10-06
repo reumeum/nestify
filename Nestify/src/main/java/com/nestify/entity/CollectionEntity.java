@@ -6,6 +6,7 @@ import java.util.Set;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -13,9 +14,10 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
-import jakarta.persistence.JoinTable;
-import jakarta.persistence.ManyToMany;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
+import jakarta.persistence.PrePersist;
+import jakarta.persistence.PreUpdate;
 import jakarta.persistence.Table;
 import lombok.Builder;
 import lombok.Getter;
@@ -47,25 +49,25 @@ public class CollectionEntity {
     
     // 연관된 UserEntity 설정
     @ManyToOne(fetch = FetchType.LAZY)
+    @ToString.Exclude
     @JoinColumn(name = "user_id", referencedColumnName = "user_id", nullable = false)
     @JsonIgnore
     private UserEntity user;
     
     // 기본값 설정
-    private LocalDateTime created_at = LocalDateTime.now();
-    private LocalDateTime updated_at = LocalDateTime.now();
+    @Column(name = "created_at", nullable = false)
+    private LocalDateTime createdAt;
+    
+    @Column(name = "updated_at", nullable = false)
+    private LocalDateTime updatedAt;
     
     @Column(name = "is_system_collection", nullable = false)
     private boolean isSystemCollection = false;
     
-    @ManyToMany
+    @OneToMany(mappedBy = "collection", cascade = CascadeType.REMOVE)
+    @ToString.Exclude
     @JsonIgnore
-    @JoinTable(
-        name = "collection_bookmark",
-        joinColumns = @JoinColumn(name = "collection_id"),
-        inverseJoinColumns = @JoinColumn(name = "bookmark_id")
-    )
-    private Set<BookmarkEntity> bookmarks = new HashSet<>();
+    private Set<CollectionBookmark> collectionBookmarks = new HashSet<>();
     
     @Builder
     public CollectionEntity(String name, String description, String colorCode, UserEntity user, LocalDateTime created_at, LocalDateTime updated_at) {
@@ -73,7 +75,18 @@ public class CollectionEntity {
         this.description = description;
         this.colorCode = colorCode;
         this.user = user;
-        this.created_at = created_at;
-        this.updated_at = updated_at;
     }
+    
+	//생성 시점에 설정
+	@PrePersist
+	protected void onCreate() {
+		this.createdAt = LocalDateTime.now();
+		this.updatedAt = LocalDateTime.now();
+	}
+	
+	//갱신 시점에 설정
+	@PreUpdate
+	protected void onUpdate() {
+		this.updatedAt = LocalDateTime.now();
+	}
 }

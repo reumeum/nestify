@@ -10,11 +10,11 @@
 			<div class="flex-between sidebar-header">
 				<div class="flex">
 					<div class="username" th:text="${user.username}"></div>
-					<svg class="w-6 h-6 text-gray-800 dark:text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24">
+					<svg class="w-6 h-6 text-gray-800 dark:text-white open-dropdown-btn" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24">
 	  					<path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m8 10 4 4 4-4"/>
 					</svg>
 				</div>
-				<svg class="w-6 h-6 text-gray-800 dark:text-white open-modal-btn" aria-hidden="true"
+				<svg class="w-6 h-6 text-gray-800 dark:text-white open-modal-btn" id="openAddModalBtn" aria-hidden="true"
 					xmlns="http://www.w3.org/2000/svg" width="24" height="24"
 					fill="none" viewBox="0 0 24 24">
 	  					<path stroke="currentColor" stroke-linecap="round"
@@ -27,7 +27,7 @@
 					<svg class="w-6 h-6 text-gray-800 dark:text-white menu-icon" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" viewBox="0 0 24 24">
   						<path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.4" d="m17 21-5-4-5 4V3.889a.92.92 0 0 1 .244-.629.808.808 0 0 1 .59-.26h8.333a.81.81 0 0 1 .589.26.92.92 0 0 1 .244.63V21Z"/>
 					</svg>
-					<a href="/dashboard">All Bookmarks</a>
+					<a href="/dashboard/0">All Bookmarks</a>
 				</li>
 				<li class="flex">
 					<svg class="w-[22px] h-[22px] text-gray-800 dark:text-white menu-icon" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" viewBox="0 0 24 24">
@@ -36,15 +36,13 @@
 					<a href="/dashboard/-1">Unsorted</a>
 				</li>
 				<li class="no-hover">
-					<a href="#">Collections</a>
+					<a href="">Collections</a>
 					<ul class="submenu"></ul>
 				</li>
-				<li><a href="#">Favorites</a></li>
-				<li><a href="#">Settings</a></li>
 			</ul>
 			
-			<!-- 모달 창 -->
-		    <div id="modal" class="modal">
+			<!-- 컬렉션 추가 모달 창 -->
+		    <div id="addCollectionModal" class="modal">
 		        <div class="modal-content">
 		            <h2>New Collection</h2>
 		            <input type="color" id="colorPicker">
@@ -58,7 +56,23 @@
 		            <button class="close-btn">Close</button>
 		        </div>
 		    </div>
-		    <script type="text/javascript" src="js/nest/sidebar.js"></script>
+			
+			<!-- 컬렉션 수정 모달 창 -->
+		    <div id="editCollectionModal" class="modal">
+		        <div class="modal-content">
+		            <h2>Edit Collection</h2>
+		            <input type="color" id="colorPickerEdit">
+		            <div>
+		            	<input type="text" id="collectionNameEdit" placeholder="collection name" class="modal-input-style"/>            
+		            </div>
+		            <div>
+		            	<textarea id="collectionDescriptionEdit" rows="5" cols="10" placeholder="description" class="modal-input-style"></textarea>
+		            </div>
+		            <button class="basic-btn" id="editCollectionBtn">Edit</button>
+		            <button class="close-btn">Close</button>
+		        </div>
+		    </div>
+		    <script type="text/javascript" src="/js/nest/sidebar.js"></script>
 		</div>
 	</div>
 </body>

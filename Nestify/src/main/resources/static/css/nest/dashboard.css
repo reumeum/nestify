@@ -1,8 +1,7 @@
 .main-content {
-  padding: 20px;
-  min-height: 100vh; /* 콘텐츠가 부족할 경우에도 최소한 화면 높이에 맞게 설정 */
+	padding: 20px;
+	min-height: 100vh; /* 콘텐츠가 부족할 경우에도 최소한 화면 높이에 맞게 설정 */
 }
-
 
 .header {
 	display: flex;
@@ -12,7 +11,7 @@
 }
 
 .search-bar {
-	width: 50%;
+	width: 400px;
 	padding: 10px;
 	border: 1px solid #ccc;
 	border-radius: 4px;
@@ -40,8 +39,27 @@
 	background-color: #34495e;
 }
 
+#selectedCollection {
+	display: flex;
+	align-items: center;
+	margin: 0 0 12px 5px;
+}
+
+#selectedCollectionIcon {
+	display: block;
+	width: 20px;
+	height: 20px;
+	border-radius: 50px;
+	margin-right: 8px;
+}
+
+#selectedCollectionName {
+	font-weight: 600;
+	font-size: 1.5rem;
+}
+
 .bookmark-container {
-	max-width: 800px;
+	width: 800px;
 	margin: 0 auto;
 	padding: 20px;
 	background-color: #fff;
@@ -60,7 +78,7 @@
 	border-bottom: none;
 }
 
-.bookmark-thumbnail > img {
+.bookmark-thumbnail>img {
 	width: 50px;
 	height: 50px;
 	background-color: #ccc;
@@ -76,6 +94,10 @@
 	font-size: 18px;
 	font-weight: bold;
 	margin: 0 0 5px 0;
+}
+
+.bookmark-title a {
+	color: inherit;
 }
 
 .bookmark-info {
@@ -153,4 +175,72 @@
 
 .bookmark-modal-content button[disabled]:hover {
 	background-color: #ccc; /* 배경색을 회색으로 변경 */
+}
+
+.filter-container {
+	position: relative;
+	display: inline-block;
+	margin: 20px;
+}
+
+.filterbtn {
+	background-color: #e2e4e6;
+	color: #333;
+	font-size: 16px;
+	border: none;
+	cursor: pointer;
+	padding: 10px 16px;
+	display: flex;
+	align-items: center;
+	gap: 10px;
+	border-radius: 4px;
+	box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.1);
+}
+
+.filterbtn svg.icon {
+	width: 20px;
+	height: 20px;
+}
+
+.filter-content {
+	display: none;
+	position: absolute;
+	background-color: #fff;
+	min-width: 200px;
+	box-shadow: 0px 8px 16px rgba(0, 0, 0, 0.1);
+	z-index: 1;
+	border-radius: 4px;
+	padding: 10px 0;
+	margin-top: 5px;
+	right: 0;
+}
+
+.filter-content label {
+	display: flex;
+	align-items: center;
+	padding: 8px 16px;
+	cursor: pointer;
+	font-size: 14px;
+}
+
+.filter-content label:hover {
+	background-color: #f9f9f9;
+}
+
+.filter-content label input {
+	margin-right: 10px;
+}
+
+.filter-content label svg.icon {
+	margin-right: 8px;
+	width: 16px;
+	height: 16px;
+}
+
+.dropdown:hover .filter-content {
+	display: block;
+}
+
+input[type="radio"] {
+	cursor: pointer;
 }

@@ -27,6 +27,26 @@ a {
 	text-decoration: none;
 }
 
+.close-btn {
+	background-color: red;
+	color: white;
+	padding: 5px 10px;
+	border: none;
+	cursor: pointer;
+	border-radius: 4px;
+	margin-top: 10px;
+}
+
+.basic-btn {
+	background-color: green;
+	color: white;
+	padding: 5px 10px;
+	border: none;
+	cursor: pointer;
+	border-radius: 4px;
+	margin-top: 10px;
+}
+
 
 /* Flexbox 유틸리티 클래스 */
 .flex {
@@ -44,4 +64,14 @@ a {
     display: flex;
     justify-content: space-between;
     align-items: center;
+}
+
+/* input-style */
+.input-style {
+	width: 100%;
+	padding: 8px;
+	margin-bottom: 10px;
+	border: 1px solid #ccc;
+	border-radius: 4px;
+	resize: none;
 }

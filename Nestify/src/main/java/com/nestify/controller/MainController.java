@@ -57,12 +57,22 @@ public class MainController {
 	        
 	        log.debug("<<로그인 성공>> : " + user);
 			
-			return "redirect:/dashboard";
+			return "redirect:/dashboard/0";
 		} else {
 			// 인증 실패: 에러 메시지를 모델에 추가하고 로그인 페이지로 다시 돌아가기
 			model.addAttribute("errorMsg", "Invalid email or password");
 			return "main/signin";
 		}
 	}
+	
+	@PostMapping("/logout")
+	public String logout(HttpSession session) {
+	    // 세션 무효화
+	    session.invalidate();
+	    
+	    // 로그아웃 후 로그인 페이지로 리다이렉트
+	    return "redirect:/signin";
+	}
+	
 
 }

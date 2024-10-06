@@ -8,6 +8,8 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.PrePersist;
+import jakarta.persistence.PreUpdate;
 import jakarta.persistence.Table;
 import jakarta.persistence.UniqueConstraint;
 import lombok.AccessLevel;
@@ -20,7 +22,6 @@ import lombok.ToString;
 @Entity
 @Getter
 @Table(name = "\"user\"", uniqueConstraints = {
-	    @UniqueConstraint(columnNames = {"username"}),
 	    @UniqueConstraint(columnNames = {"email"})
 	})
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -41,16 +42,30 @@ public class UserEntity implements Serializable {
 	private String email;
 	
     // 기본값 설정
-    private LocalDateTime created_at = LocalDateTime.now();
-    private LocalDateTime updated_at = LocalDateTime.now();
+	@Column(name = "created_at", nullable = false)
+    private LocalDateTime createdAt;
+	
+	@Column(name = "updated_at", nullable = false)
+    private LocalDateTime updatedAt;
 	
 	@Builder(toBuilder = true)
-	public UserEntity(Long userId, String username, String password, String email, LocalDateTime created_at, LocalDateTime updated_at) {
+	public UserEntity(Long userId, String username, String password, String email) {
 		this.userId = userId;
 		this.username = username;
 		this.password = password;
 		this.email = email;
-		this.created_at = created_at;
-		this.updated_at = updated_at;
+	}
+	
+	//생성 시점에 설정
+	@PrePersist
+	protected void onCreate() {
+		this.createdAt = LocalDateTime.now();
+		this.updatedAt = LocalDateTime.now();
+	}
+	
+	//갱신 시점에 설정
+	@PreUpdate
+	protected void onUpdate() {
+		this.updatedAt = LocalDateTime.now();
 	}
 }

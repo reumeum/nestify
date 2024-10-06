@@ -1,0 +1,58 @@
+/* Edit Panel */
+.edit-panel {
+	max-width: 500px;
+	width: 40%;
+	padding: 20px;
+	display: none;
+	border-left: 1px solid #ccc;
+}
+
+.edit-panel.active {
+	display: block;
+}
+
+.edit-panel h2 {
+	margin-top: 0;
+	margin-bottom: 30px;
+}
+
+.flex-center .basic-btn {
+	margin-right: 5px;
+}
+
+.edit-panel .relative-div {
+	position: relative;
+}
+
+.edit-panel #coverImgPreview {
+	width: 100%;
+	height: auto; /* 높이를 콘텐츠에 맞게 자동으로 */
+	max-height: 200px; /* 최대 높이를 제한 */
+	object-fit: cover;
+	margin-bottom: 10px;
+}
+
+.edit-panel #editImgIconDiv {
+	background-color: #fff;
+	padding: 5px;
+	border-radius: 50px;
+	height: 40px;
+	width: 40px;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	position: absolute;
+	bottom: 20px; /* 커버 이미지 하단에서 10px 위 */
+	right: 10px;  /* 커버 이미지 우측에서 10px 왼쪽 */
+	box-shadow: 2px 2px 8px rgba(0, 0, 0, 0.08);
+	cursor: pointer;
+}
+
+.edit-panel #coverImgPicker {
+	display: none;
+}
+
+.edit-panel textarea {
+	min-height: 10rem;
+	max-height: 20rem;
+}

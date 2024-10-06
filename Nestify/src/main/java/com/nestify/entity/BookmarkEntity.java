@@ -6,6 +6,7 @@ import java.util.Set;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -13,8 +14,10 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToMany;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
+import jakarta.persistence.PrePersist;
+import jakarta.persistence.PreUpdate;
 import jakarta.persistence.Table;
 import lombok.AccessLevel;
 import lombok.Builder;
@@ -28,7 +31,7 @@ import lombok.ToString;
 @Getter
 @Setter
 @Table(name = "bookmark")
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@NoArgsConstructor(access = AccessLevel.PUBLIC)
 public class BookmarkEntity {
 
 	@Id
@@ -48,31 +51,42 @@ public class BookmarkEntity {
 	@Column(name = "description", columnDefinition = "TEXT")
 	private String note;
 
-	@Column(name = "is_favorite", nullable = false)
-	private boolean isFavorite = false;
-
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "user_id", referencedColumnName = "user_id", nullable = false)
+	@ToString.Exclude
 	@JsonIgnore
 	private UserEntity user;
 
-	private LocalDateTime created_at = LocalDateTime.now();
-	private LocalDateTime updated_at = LocalDateTime.now();
+	@Column(name = "created_at", nullable = false)
+	private LocalDateTime createdAt;
 	
-    @ManyToMany(mappedBy = "bookmarks")
+	@Column(name = "updated_at", nullable = false)
+	private LocalDateTime updatedAt;
+	
+	@OneToMany(mappedBy = "bookmark", cascade = CascadeType.REMOVE, fetch = FetchType.EAGER)
     @JsonIgnore
-    private Set<CollectionEntity> collections = new HashSet<>();
+    private Set<CollectionBookmark> collectionBookmarks = new HashSet<>();
 
 	@Builder
-    public BookmarkEntity(String title, String url, String coverImgUrl, String note, boolean isFavorite, UserEntity user) {
+    public BookmarkEntity(String title, String url, String coverImgUrl, String note, UserEntity user) {
         this.title = title;
         this.url = url;
         this.coverImgUrl = coverImgUrl;
         this.note = note;
-        this.isFavorite = isFavorite;
         this.user = user;
-        this.created_at = LocalDateTime.now();
-        this.updated_at = LocalDateTime.now();
     }
+	
+	//생성 시점에 설정
+	@PrePersist
+	protected void onCreate() {
+		this.createdAt = LocalDateTime.now();
+		this.updatedAt = LocalDateTime.now();
+	}
+	
+	//갱신 시점에 설정
+	@PreUpdate
+	protected void onUpdate() {
+		this.updatedAt = LocalDateTime.now();
+	}
 
 }

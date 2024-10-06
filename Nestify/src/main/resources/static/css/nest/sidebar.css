@@ -6,7 +6,6 @@
 }
 
 body {
-	display: flex;
 	/* 	height: 100vh; */
 	background-color: #f4f4f4;
 }
@@ -91,6 +90,44 @@ nav {
 	display: block;
 }
 
+.operation-menu-container {
+	position: absolute; 
+	background-color: white !important;
+	border: 1px solid #ccc;
+	border-radius: 6px
+}
+
+.operation-menu-container li {
+	cursor: pointer;
+	padding: 5px 10px;
+}
+
+.operation-menu-container li:hover {
+	background-color: #cccccc;
+}
+
+.open-dropdown-btn {
+	cursor: pointer;
+}
+
+.dropdown-menu-container {
+	position: absolute; 
+	background-color: white !important;
+	border: 1px solid #ccc;
+	border-radius: 2px;
+	width: 250px;
+	box-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+}
+
+.dropdown-menu-container li {
+	cursor: pointer;
+	padding: 5px 10px;
+}
+
+.dropdown-menu-container li:hover {
+	background-color: #cccccc;
+}
+
 .color-icon {
 	display: block;
 	width: 16px;
@@ -123,26 +160,6 @@ nav {
 	width: 300px;
 }
 
-.close-btn {
-	background-color: red;
-	color: white;
-	padding: 5px 10px;
-	border: none;
-	cursor: pointer;
-	border-radius: 4px;
-	margin-top: 10px;
-}
-
-.basic-btn {
-	background-color: green;
-	color: white;
-	padding: 5px 10px;
-	border: none;
-	cursor: pointer;
-	border-radius: 4px;
-	margin-top: 10px;
-}
-
 .open-modal-btn {
 	cursor: pointer;
 }
@@ -152,6 +169,7 @@ nav {
 	padding: 5px;
 	resize: none;
 	margin: 3px auto;
+	border: 1px solid #ccc;
 }
 
 /* 기본 input[type="color"] 스타일 */
