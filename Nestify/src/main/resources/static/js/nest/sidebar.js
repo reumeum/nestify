@@ -63,7 +63,7 @@ $(document).ready(function() {
 				url: '/logout',
 				type: 'post',
 				success: function() {
-					location.reload();
+					location.href="/main"
 				},
 				error: function(xhr, status, error) {
 					alert('Failed to logout. Please try again.');

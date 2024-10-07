@@ -6,7 +6,6 @@
 }
 
 body {
-	/* 	height: 100vh; */
 	background-color: #f4f4f4;
 }
 
@@ -98,6 +97,7 @@ nav {
 }
 
 .operation-menu-container li {
+	color: #333;
 	cursor: pointer;
 	padding: 5px 10px;
 }
@@ -120,6 +120,7 @@ nav {
 }
 
 .dropdown-menu-container li {
+	color: #333;
 	cursor: pointer;
 	padding: 5px 10px;
 }

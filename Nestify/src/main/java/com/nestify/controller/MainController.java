@@ -68,8 +68,8 @@ public class MainController {
 	    // 세션 무효화
 	    session.invalidate();
 	    
-	    // 로그아웃 후 로그인 페이지로 리다이렉트
-	    return "redirect:/signin";
+	    // 로그아웃 후 메인 페이지로 리다이렉트
+	    return "redirect:/main";
 	}
 	
 

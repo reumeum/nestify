@@ -6,27 +6,33 @@ body {
 	display: flex;
 	flex-direction: column;
 	min-height: 100vh;
+	background: linear-gradient(to bottom, #333, #2c3e50);
+	color: #f5f5f5;
+	background-color: #2c3e50;
+}
+
+a {
+	color: inherit;
 }
 
 /* 헤더 스타일 */
 header {
-	background: #333;
 	color: #fff;
-	padding: 10px 0;
+	padding: 10px 30px;
 	text-align: center;
 }
 
 /* 푸터 스타일 */
 footer {
-	background-color: #333;
-	color: white;
 	text-align: center;
 	padding: 10px 0;
 }
 
 .container {
+	display: flex;
 	flex: 1;
-	padding: 20px;
+	align-items:center;
+	padding: 15px 20px 50px 20px;
 }
 
 .main-nav-item {
@@ -38,4 +44,14 @@ footer {
 	margin: 12rem auto;
 	max-width: 50rem;
 	text-align: center;
+}
+
+h1#mainTitle {
+	font-size: 8rem;
+}
+
+#mainDescription {
+	font-style: italic;
+	display: block;
+	margin-top: -20px;
 }
