@@ -9,8 +9,6 @@ import java.util.UUID;
 import org.springframework.web.multipart.MultipartFile;
 
 public class FileUtil {
-	//기본 저장 경로 (상대 경로)
-	private static final String BASE_DIRECTORY = "/images/";
 
 	//파일 저장 유틸리티
 	public static String saveFile(MultipartFile file, Long userId, String directory) throws IOException {
@@ -47,6 +45,18 @@ public class FileUtil {
 	// 커버 이미지 저장 메서드
 	public static String saveCoverImg(MultipartFile file, Long userId) throws IOException {
 		return saveFile(file, userId, "cover-images");
+	}
+	
+	// 파일 삭제 메서드
+	public static void deleteFile(String relativeFilePath) throws IOException {
+		if (relativeFilePath == null || relativeFilePath.isEmpty()) {
+			return;
+		}
+		
+		Path filePath = Paths.get("src/main/resources/static" + relativeFilePath);
+		if (Files.exists(filePath)) {
+			Files.delete(filePath);
+		}
 	}
 
 	// 파일 확장자를 추출하는 메서드

@@ -48,7 +48,7 @@ public class NestRestController {
 	/*
 	 * 특정 사용자의 컬렉션 목록 조회
 	 */
-	@GetMapping("/api/v1/users/{userId}/collections")
+	@GetMapping("/api/v1/collections/{userId}")
 	public ResponseEntity<Object> getCollectionsByUserId(@PathVariable("userId") Long userId) {
 		log.debug("userId : " + userId);
 
@@ -62,9 +62,6 @@ public class NestRestController {
 	@PostMapping("/api/v1/collection")
 	public ResponseEntity<Object> saveCollection(@RequestBody CollectionEntity collectionEntity, HttpSession session) {
 		UserEntity user = (UserEntity) session.getAttribute("user");
-		if (user == null) {
-			return new ResponseEntity<>("User not found in session", HttpStatus.UNAUTHORIZED);
-		}
 
 		collectionEntity.setUser(user); // UserEntity 객체 설정
 
@@ -80,11 +77,6 @@ public class NestRestController {
 	        @ModelAttribute CollectionForm collectionForm, HttpSession session) {
 
 	    UserEntity user = (UserEntity) session.getAttribute("user");
-
-	    if (user == null) {
-	        return new ResponseEntity<>("User not found in session", HttpStatus.UNAUTHORIZED);
-	    }
-
 	    try {
 	        // Service 계층으로 비즈니스 로직 위임
 	    	collectionForm.setCollectionId(collectionId);
@@ -111,16 +103,12 @@ public class NestRestController {
 	 * 북마크 등록
 	 */
 	// "/api/v1/collection/bookmark" --> add to unsorted
-	@PostMapping({ "/api/v1/collection/{collectionId}/bookmark", "/api/v1/collection/bookmark" })
+	@PostMapping({ "/api/v1/collection/{collectionId}/bookmark", "/api/v1/bookmark" })
 	public ResponseEntity<Object> saveBookmark(
 			@PathVariable(value = "collectionId", required = false) Long collectionId,
 			@RequestBody BookmarkEntity bookmarkEntity, HttpSession session) {
 
 		UserEntity user = (UserEntity) session.getAttribute("user");
-
-		if (user == null) {
-			return new ResponseEntity<>("User not found in session", HttpStatus.UNAUTHORIZED);
-		}
 
 		log.debug("collectionId : " + collectionId);
 		log.debug("bookmark URL : " + bookmarkEntity.getUrl());
@@ -178,10 +166,6 @@ public class NestRestController {
 
 	    UserEntity user = (UserEntity) session.getAttribute("user");
 
-	    if (user == null) {
-	        return new ResponseEntity<>("User not found in session", HttpStatus.UNAUTHORIZED);
-	    }
-
 	    try {
 	        // Service 계층으로 비즈니스 로직 위임
 	    	bookmarkForm.setBookmarkId(bookmarkId);
@@ -206,13 +190,8 @@ public class NestRestController {
 												  @RequestParam(value = "size", defaultValue = "20") int size,
 												  @RequestParam(value = "sortBy", defaultValue = "updatedAt") String sortBy,
 												  @RequestParam(value = "desc", defaultValue = "true") boolean desc) {
-		
-		UserEntity user = (UserEntity) session.getAttribute("user");
-		
-		if (user == null) {
-			return new ResponseEntity<>("User not found in session", HttpStatus.UNAUTHORIZED);
-		}
-		
+
+
 		Page<BookmarkDTO> bookmarkDTOs = nestService.searchBookmarks(userId, collectionId, keyword, page, size, sortBy, desc);
 		
 		for (BookmarkDTO bookmark : bookmarkDTOs) {

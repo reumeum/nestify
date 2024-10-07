@@ -135,7 +135,7 @@ function addBookmark() {
 	}
 
 	const bookmarkEntity = { url };
-	const endpoint = collectionId < 1 ? '/api/v1/collection/bookmark' : `/api/v1/collection/${collectionId}/bookmark`;
+	const endpoint = collectionId < 1 ? '/api/v1/bookmark' : `/api/v1/collection/${collectionId}/bookmark`;
 
 	$.ajax({
 		url: endpoint,

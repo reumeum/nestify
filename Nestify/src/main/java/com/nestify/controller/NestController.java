@@ -38,10 +38,6 @@ public class NestController {
 	    	model.addAttribute("collection", collection);
 	    	log.debug("collection added to model" + collection);
 	    }
-
-	    if (user == null) {
-	        return "redirect:/signin";
-	    }
 	    
 	    model.addAttribute("user", user);
 
@@ -62,11 +58,6 @@ public class NestController {
 	    	model.addAttribute("collection", collection);
 	    	log.debug("collection added to model" + collection);
 	    }
-
-		// 사용자 인증 확인
-		if (user == null) {
-			return "redirect:/signin"; // 로그인 페이지로 리다이렉트
-		}
 
 		
 		// 컬렉션 리스트 조회

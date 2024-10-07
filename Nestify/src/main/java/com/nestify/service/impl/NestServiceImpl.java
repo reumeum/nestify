@@ -76,26 +76,26 @@ public class NestServiceImpl implements NestService {
 	@Override
 	@Transactional
 	public CollectionEntity updateCollection(CollectionForm collectionForm, UserEntity user) {
-		
-        CollectionEntity collectionEntity = collectionJpaRepository.findById(collectionForm.getCollectionId())
-        	.orElseThrow(() -> new RuntimeException("Collection not found with id: " + collectionForm.getCollectionId()));
 
-        // 필드 업데이트
-        collectionEntity.setCollectionId(collectionForm.getCollectionId());
-        collectionEntity.setName(collectionForm.getName());
-        collectionEntity.setColorCode(collectionForm.getColorCode());
-        collectionEntity.setDescription(collectionForm.getDescription());
-        collectionEntity.setUser(user);
-        	
+		CollectionEntity collectionEntity = collectionJpaRepository.findById(collectionForm.getCollectionId())
+				.orElseThrow(() -> new RuntimeException(
+						"Collection not found with id: " + collectionForm.getCollectionId()));
 
-        // updated_at 필드 갱신
-        collectionEntity.setUpdatedAt(LocalDateTime.now());
-        
-        log.debug("컬렉션 수정 : " + collectionEntity);
+		// 필드 업데이트
+		collectionEntity.setCollectionId(collectionForm.getCollectionId());
+		collectionEntity.setName(collectionForm.getName());
+		collectionEntity.setColorCode(collectionForm.getColorCode());
+		collectionEntity.setDescription(collectionForm.getDescription());
+		collectionEntity.setUser(user);
 
-        // 저장
-        return collectionJpaRepository.save(collectionEntity);
-    }
+		// updated_at 필드 갱신
+		collectionEntity.setUpdatedAt(LocalDateTime.now());
+
+		log.debug("컬렉션 수정 : " + collectionEntity);
+
+		// 저장
+		return collectionJpaRepository.save(collectionEntity);
+	}
 
 	/*
 	 * 컬렉션 삭제
@@ -145,164 +145,187 @@ public class NestServiceImpl implements NestService {
 	 */
 	@Override
 	@Transactional
-    public BookmarkEntity updateBookmark(BookmarkForm bookmarkForm, UserEntity user) {
-        BookmarkEntity bookmarkEntity = bookmarkJpaRepository.findById(bookmarkForm.getBookmarkId())
-            .orElseThrow(() -> new RuntimeException("Bookmark not found with id: " + bookmarkForm.getBookmarkId()));
+	public BookmarkEntity updateBookmark(BookmarkForm bookmarkForm, UserEntity user) {
+		BookmarkEntity bookmarkEntity = bookmarkJpaRepository.findById(bookmarkForm.getBookmarkId())
+				.orElseThrow(() -> new RuntimeException("Bookmark not found with id: " + bookmarkForm.getBookmarkId()));
 
-        // 필드 업데이트
-        bookmarkEntity.setTitle(bookmarkForm.getTitle());
-        bookmarkEntity.setUrl(bookmarkForm.getUrl());
-        bookmarkEntity.setNote(bookmarkForm.getNote());
-        bookmarkEntity.setUser(user);
-        
-        // 기존 컬렉션을 명시적으로 제거
-        for (CollectionBookmark collectionBookmark : bookmarkEntity.getCollectionBookmarks()) {
-            collectionBookmarkJpaRepository.delete(collectionBookmark); // CollectionBookmark 삭제
-        }
-        
-        bookmarkEntity.getCollectionBookmarks().clear();  // 관계를 제거
+		// 필드 업데이트
+		bookmarkEntity.setTitle(bookmarkForm.getTitle());
+		bookmarkEntity.setUrl(bookmarkForm.getUrl());
+		bookmarkEntity.setNote(bookmarkForm.getNote());
+		bookmarkEntity.setUser(user);
 
-        // 컬렉션 업데이트
-        List<Long> collectionIds = bookmarkForm.getCollectionId();
-        List<CollectionEntity> collections = new ArrayList<CollectionEntity>();
-        
-        log.debug("collection Id (Form) : " + bookmarkForm.getCollectionId());
-        
-        if (bookmarkForm.getCollectionId().stream().findFirst().orElse((long) 0) == 0) {
-        	CollectionEntity unsortedCollection = collectionJpaRepository.findByUser_UserIdAndIsSystemCollectionTrue(user.getUserId())
-        			.orElseThrow(() -> new RuntimeException("Collection not found!"));
-        	collections.add(unsortedCollection);
-        } else {
-        	collections = getCollectionsByIds(collectionIds);
-        }
-        
-        Set<CollectionBookmark> collectionBookmarks = new HashSet<CollectionBookmark>();
-        for (CollectionEntity collection : collections) {
-        	CollectionBookmark collectionBookmark = new CollectionBookmark();
-        	collectionBookmark.setBookmark(bookmarkEntity);
-        	collectionBookmark.setCollection(collection);
-        	collectionBookmarks.add(collectionBookmark);
-        	
-            // 새로 추가된 CollectionBookmark 엔티티 저장
-            collectionBookmarkJpaRepository.save(collectionBookmark);
-        	
-        	log.debug("북마크 수정 컬렉션 목록 : " + collection);
-        }
+		// 기존 컬렉션을 명시적으로 제거
+		for (CollectionBookmark collectionBookmark : bookmarkEntity.getCollectionBookmarks()) {
+			collectionBookmarkJpaRepository.delete(collectionBookmark); // CollectionBookmark 삭제
+		}
 
-        // 커버 이미지 처리
-        MultipartFile coverImg = bookmarkForm.getCoverImg();
-        if (coverImg != null && !coverImg.isEmpty()) {
-            try {
-                bookmarkEntity.setCoverImgUrl(FileUtil.saveCoverImg(coverImg, user.getUserId()));
-            } catch (IOException e) {
-                throw new RuntimeException("Failed to save cover image", e);
-            }
-        }
+		bookmarkEntity.getCollectionBookmarks().clear(); // 관계를 제거
 
-        // updated_at 필드 갱신
-        bookmarkEntity.setUpdatedAt(LocalDateTime.now());
-        
-        log.debug("북마크 수정 : " + bookmarkEntity);
+		// 컬렉션 업데이트
+		List<Long> collectionIds = bookmarkForm.getCollectionId();
+		List<CollectionEntity> collections = new ArrayList<CollectionEntity>();
 
-        // 저장
-        return bookmarkJpaRepository.save(bookmarkEntity);
-    }
+		log.debug("collection Id (Form) : " + bookmarkForm.getCollectionId());
+
+		if (bookmarkForm.getCollectionId().stream().findFirst().orElse((long) 0) == 0) {
+			CollectionEntity unsortedCollection = collectionJpaRepository
+					.findByUser_UserIdAndIsSystemCollectionTrue(user.getUserId())
+					.orElseThrow(() -> new RuntimeException("Collection not found!"));
+			collections.add(unsortedCollection);
+		} else {
+			collections = getCollectionsByIds(collectionIds);
+		}
+
+		Set<CollectionBookmark> collectionBookmarks = new HashSet<CollectionBookmark>();
+		for (CollectionEntity collection : collections) {
+			CollectionBookmark collectionBookmark = new CollectionBookmark();
+			collectionBookmark.setBookmark(bookmarkEntity);
+			collectionBookmark.setCollection(collection);
+			collectionBookmarks.add(collectionBookmark);
+
+			// 새로 추가된 CollectionBookmark 엔티티 저장
+			collectionBookmarkJpaRepository.save(collectionBookmark);
+
+			log.debug("북마크 수정 컬렉션 목록 : " + collection);
+		}
+
+		// 커버 이미지 처리
+		MultipartFile coverImg = bookmarkForm.getCoverImg();
+		
+		if (coverImg != null && !coverImg.isEmpty()) {
+			try {
+				bookmarkEntity.setCoverImgUrl(FileUtil.saveCoverImg(coverImg, user.getUserId()));
+			} catch (IOException e) {
+				throw new RuntimeException("Failed to save cover image", e);
+			}
+		}
+
+		// updated_at 필드 갱신
+		bookmarkEntity.setUpdatedAt(LocalDateTime.now());
+
+		log.debug("북마크 수정 : " + bookmarkEntity);
+
+		// 저장
+		return bookmarkJpaRepository.save(bookmarkEntity);
+	}
 
 	@Override
 	public List<CollectionEntity> getCollectionsByIds(List<Long> collectionIds) {
 		return collectionJpaRepository.findAllById(collectionIds);
 	}
-	
+
 	@Override
 	public Optional<CollectionEntity> getCollectionById(Long collectionId) {
 		return collectionJpaRepository.findById(collectionId);
 	}
 
-
 	@Override
 	public void deleteBookmarkById(Long bookmarkId) {
-		Optional<BookmarkEntity> optionalBookmark = bookmarkJpaRepository.findById(bookmarkId);
+		BookmarkEntity bookmark = bookmarkJpaRepository.findById(bookmarkId)
+				.orElseThrow(() -> new RuntimeException("Bookmark not found!"));
 
-		if (optionalBookmark.isPresent()) {
-			bookmarkJpaRepository.deleteById(bookmarkId);
+		// 커버이미지가 있으면 삭제
+		String coverImagePath = bookmark.getCoverImgUrl();
+		
+		if (coverImagePath != null && coverImagePath.startsWith("/images/")) {
+			try {
+				FileUtil.deleteFile(coverImagePath);
+			} catch (IOException e) {
+				log.error("Failed to delete cover Image: " + coverImagePath, e);
+			}
 		}
+		
+		// 북마크 삭제
+		bookmarkJpaRepository.delete(bookmark);
 	}
 
 	@Override
 	public BookmarkDTO getBookmarkByBookmarkId(Long bookmarkId) {
-		
+
 		BookmarkEntity bookmark = bookmarkJpaRepository.findById(bookmarkId)
 				.orElseThrow(() -> new RuntimeException("Bookmark not found"));
-		
+
 		BookmarkDTO bookmarkDTO = new BookmarkDTO(bookmark);
 
 		return bookmarkDTO;
 	}
 
 	@Override
-	public Page<BookmarkDTO> searchBookmarks(Long userId, Long collectionId, String keyword, int page, int size, String sortBy, boolean desc) {
-        Pageable pageable = PageRequest.of(page, size, Sort.by(desc ? Sort.Direction.DESC : Sort.Direction.ASC, sortBy));
+	public Page<BookmarkDTO> searchBookmarks(Long userId, Long collectionId, String keyword, int page, int size,
+			String sortBy, boolean desc) {
+		Pageable pageable = PageRequest.of(page, size,
+				Sort.by(desc ? Sort.Direction.DESC : Sort.Direction.ASC, sortBy));
 
-        // 동적 검색을 위한 Specification 생성
-        Specification<BookmarkEntity> spec = (root, query, criteriaBuilder) -> {
-            // 조인을 통해 컬렉션 접근 (bookmark와 collectionBookmarks 사이에 JOIN을 수행)
-            Join<Object, Object> collectionBookmarksJoin = root.join("collectionBookmarks");
-        	
-            List<Predicate> predicates = new ArrayList<>();
+		// 동적 검색을 위한 Specification 생성
+		Specification<BookmarkEntity> spec = (root, query, criteriaBuilder) -> {
+			// 조인을 통해 컬렉션 접근 (bookmark와 collectionBookmarks 사이에 JOIN을 수행)
+			Join<Object, Object> collectionBookmarksJoin = root.join("collectionBookmarks");
 
-            // userId가 있을 때 사용자 필터링
-            if (userId != null) {
-                predicates.add(criteriaBuilder.equal(root.get("user").get("userId"), userId));
-            }
+			List<Predicate> predicates = new ArrayList<>();
 
-            // collectionId가 있을 때 컬렉션 필터링
-            if (collectionId != null && collectionId == -1) {
-            	predicates.add(criteriaBuilder.equal(collectionBookmarksJoin.get("collection").get("isSystemCollection"), true));
-            } else if (collectionId != null) {
-                predicates.add(criteriaBuilder.equal(collectionBookmarksJoin.get("collection").get("collectionId"), collectionId));
-            }
+			// userId가 있을 때 사용자 필터링
+			if (userId != null) {
+				predicates.add(criteriaBuilder.equal(root.get("user").get("userId"), userId));
+			}
 
-            // 검색어가 있을 때 제목에서 대소문자 구분 없이 검색
-            if (keyword != null && !keyword.isEmpty()) {
-                predicates.add(criteriaBuilder.like(
-                    criteriaBuilder.lower(root.get("title")), 
-                    "%" + keyword.toLowerCase() + "%"
-                ));
-                log.debug("키워드 : " + keyword);
-            }
-			
-            // 모든 조건을 AND로 결합
-            return criteriaBuilder.and(predicates.toArray(new Predicate[0]));
-        };
+			// collectionId가 있을 때 컬렉션 필터링
+			if (collectionId != null && collectionId == -1) {
+				predicates.add(criteriaBuilder
+						.equal(collectionBookmarksJoin.get("collection").get("isSystemCollection"), true));
+			} else if (collectionId != null) {
+				predicates.add(criteriaBuilder.equal(collectionBookmarksJoin.get("collection").get("collectionId"),
+						collectionId));
+			}
 
-        // 조건에 맞는 결과를 페이징 처리하여 반환
-        return bookmarkJpaRepository.findAll(spec, pageable)
-        		.map(bookmarkEntity -> convertToDTO(bookmarkEntity));
-    }
-	
-	public BookmarkDTO convertToDTO(BookmarkEntity bookmark) {
-	    // DTO로 변환
-	    BookmarkDTO dto = new BookmarkDTO();
-	    dto.setBookmarkId(bookmark.getBookmarkId());
-	    dto.setTitle(bookmark.getTitle());
-	    dto.setUrl(bookmark.getUrl());
-	    dto.setCoverImgUrl(bookmark.getCoverImgUrl());
-	    dto.setNote(bookmark.getNote());
-	    dto.setCreatedAt(bookmark.getCreatedAt());
-	    dto.setUpdatedAt(bookmark.getUpdatedAt());
+			// 검색어가 있을 때 제목에서 대소문자 구분 없이 검색
+			if (keyword != null && !keyword.isEmpty()) {
+				predicates.add(criteriaBuilder.like(criteriaBuilder.lower(root.get("title")),
+						"%" + keyword.toLowerCase() + "%"));
+				log.debug("키워드 : " + keyword);
+			}
 
-	    // Collection 정보가 있는 경우, 첫 번째 Collection 정보를 DTO에 설정
-	    bookmark.getCollectionBookmarks().stream().findFirst().ifPresent(cb -> {
-	        dto.setCollectionId(cb.getCollection().getCollectionId());
-	        dto.setCollectionName(cb.getCollection().getName());
-	        dto.setSystemCollection(cb.getCollection().isSystemCollection());
-	        dto.setCollectionColorCode(cb.getCollection().getColorCode());
-	    });
+			// 모든 조건을 AND로 결합
+			return criteriaBuilder.and(predicates.toArray(new Predicate[0]));
+		};
 
-	    return dto;
+		// 조건에 맞는 결과를 페이징 처리하여 반환
+		return bookmarkJpaRepository.findAll(spec, pageable).map(bookmarkEntity -> convertToDTO(bookmarkEntity));
 	}
 
+	public BookmarkDTO convertToDTO(BookmarkEntity bookmark) {
+		// DTO로 변환
+		BookmarkDTO dto = new BookmarkDTO();
+		dto.setBookmarkId(bookmark.getBookmarkId());
+		dto.setTitle(bookmark.getTitle());
+		dto.setUrl(bookmark.getUrl());
+		dto.setCoverImgUrl(bookmark.getCoverImgUrl());
+		dto.setNote(bookmark.getNote());
+		dto.setCreatedAt(bookmark.getCreatedAt());
+		dto.setUpdatedAt(bookmark.getUpdatedAt());
 
+		// Collection 정보가 있는 경우, 첫 번째 Collection 정보를 DTO에 설정
+		bookmark.getCollectionBookmarks().stream().findFirst().ifPresent(cb -> {
+			dto.setCollectionId(cb.getCollection().getCollectionId());
+			dto.setCollectionName(cb.getCollection().getName());
+			dto.setSystemCollection(cb.getCollection().isSystemCollection());
+			dto.setCollectionColorCode(cb.getCollection().getColorCode());
+		});
 
+		return dto;
+	}
+
+	@Override
+	public boolean isUserOwnerOfCollection(Long userId, Long resourceId) {
+		return collectionJpaRepository.findById(resourceId)
+				.map(collection -> collection.getUser().getUserId().equals(userId)) // Optional을 활용해 바로 비교
+				.orElse(false); // 없으면 false 반환
+	}
+
+	@Override
+	public boolean isUserOwnerOfBookmark(Long userId, Long resourceId) {
+		return bookmarkJpaRepository.findById(resourceId).map(bookmark -> bookmark.getUser().getUserId().equals(userId)) // Optional을 활용해 바로 비교
+				.orElse(false); // 없으면 false 반환
+	}
 
 }

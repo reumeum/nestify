@@ -76,7 +76,7 @@ $(document).ready(function() {
 	/* 컬렉션 리스트 불러오기 */
 	function getCollectionsList() {
 		$.ajax({
-			url: `/api/v1/users/${userId}/collections`,
+			url: `/api/v1/collections/${userId}`,
 			type: 'GET',
 			success: function(collections) {
 				$('.menu > li:contains("Collections") .submenu').empty();

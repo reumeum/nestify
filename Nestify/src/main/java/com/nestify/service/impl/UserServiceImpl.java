@@ -70,6 +70,9 @@ public class UserServiceImpl implements UserService {
         return false;
     }
 
+	/*
+	 * 이메일로 사용자 조회
+	 */
 	@Override
 	public UserEntity findByEmail(String email) {
 		return userJpaRepository.findByEmail(email);
