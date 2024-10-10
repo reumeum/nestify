@@ -1,13 +1,9 @@
 package com.nestify.controller;
 
 import java.io.IOException;
-import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.Set;
 
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
@@ -21,7 +17,6 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.multipart.MultipartFile;
 
 import com.nestify.dto.BookmarkDTO;
 import com.nestify.dto.BookmarkForm;
@@ -30,7 +25,6 @@ import com.nestify.entity.BookmarkEntity;
 import com.nestify.entity.CollectionEntity;
 import com.nestify.entity.UserEntity;
 import com.nestify.service.NestService;
-import com.nestify.util.FileUtil;
 import com.nestify.util.MetaTagParser;
 
 import jakarta.servlet.http.HttpSession;
@@ -187,7 +181,7 @@ public class NestRestController {
 												  @PathVariable(value = "collectionId", required = false) Long collectionId,												  
 												  @RequestParam(value = "keyword", required = false) String keyword,
 												  @RequestParam(value = "page", defaultValue = "0") int page,
-												  @RequestParam(value = "size", defaultValue = "20") int size,
+												  @RequestParam(value = "size", defaultValue = "10") int size,
 												  @RequestParam(value = "sortBy", defaultValue = "updatedAt") String sortBy,
 												  @RequestParam(value = "desc", defaultValue = "true") boolean desc) {
 
@@ -198,7 +192,7 @@ public class NestRestController {
 			log.debug(bookmark);
 		}
 		
-		return new ResponseEntity<>(bookmarkDTOs, HttpStatus.OK);
+		return new ResponseEntity<>(bookmarkDTOs.getContent(), HttpStatus.OK);
 	}
 	
 	

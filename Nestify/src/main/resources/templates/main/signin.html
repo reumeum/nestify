@@ -21,8 +21,8 @@
       <div class="input-box">
         <input id="password" name="password" type="password" placeholder="Enter your password" required>
       </div>
-      <div>
-      	<p th:text="${errorMsg}"></p>
+      <div class="alert-message-box">
+      	<p class="alert-message" th:text="${errorMsg}"></p>
       </div>
       <div class="input-box button">
         <input type="submit" value="Login">

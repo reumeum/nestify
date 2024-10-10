@@ -1,11 +1,18 @@
+// 파일 크기 제한
+const MAX_FILE_SIZE = 5 * 1024 * 1024;  // 5MB
+// 페이지별 북마크 수
+const BOOKMARKS_PER_PAGE = 10;
+
 let originalCoverImg;
+let currentPage = 0;
+let isLoading = true;
+let isLastPage = false;
 
 $(document).ready(function() {
 	const path = window.location.pathname;
 	const segments = path.split('/');
-	const collectionId = segments[2] || 0;
-
-	handleDashboardPaths(path, collectionId);
+	
+	performSearch();
 	handleEditPage(path, segments);
 	bindModalEvents();
 	bindBookmarkEvents();
@@ -13,24 +20,43 @@ $(document).ready(function() {
 	searchEvents();
 });
 
+$(window).scroll(function() {
+	//스크롤이 페이지 끝에서 100px 이내로 접근했을 때 데이터를 불러옴
+	if ($(window).scrollTop() + $(window).height() >= $(document).height() - 100 && !isLoading) {
+		const path = window.location.pathname;
+		const segments = path.split('/');
+		const collectionId = segments[2] || 0;
+		
+		isLoading = true;
+
+		handleDashboardPaths(path, collectionId);
+	}
+});
+
 // 경로에 따른 처리 함수
 function handleDashboardPaths(path, collectionId) {
 	if (path.includes("/dashboard/0")) {
-		getAllBookmarks();
+		if (!isLastPage) {
+			getAllBookmarks();
+		}
 		$("#add-to").text('Add to Unsorted');
 		$('#selectedCollectionIcon').html(`<svg class="w-[30px] h-[30px] text-gray-800 dark:text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" style="margin-top: -2px;" fill="none" viewBox="0 0 24 24">
 			  <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m17 21-5-4-5 4V3.889a.92.92 0 0 1 .244-.629.808.808 0 0 1 .59-.26h8.333a.81.81 0 0 1 .589.26.92.92 0 0 1 .244.63V21Z"/>
 			</svg>`);
 		$('#selectedCollectionName').text("All Bookmarks");
 	} else if (path.includes("dashboard/-1")) {
-		getUnsortedBookmarks();
+		if (!isLastPage) {
+			getUnsortedBookmarks();
+		}
 		$("#add-to").text('Add to Unsorted');
 		$('#selectedCollectionIcon').html(`<svg class="w-[30px] h-[30px] text-gray-800 dark:text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" style="margin-top: -2px;" fill="none" viewBox="0 0 24 24">
 			  <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 13h3.439a.991.991 0 0 1 .908.6 3.978 3.978 0 0 0 7.306 0 .99.99 0 0 1 .908-.6H20M4 13v6a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-6M4 13l2-9h12l2 9"/>
 			</svg>`);
 		$('#selectedCollectionName').text("Unsorted");
 	} else {
-		getBookmarksByCollection(collectionId);
+		if (!isLastPage) {
+			getBookmarksByCollection(collectionId);
+		}
 		$("#add-to").text(`Add to ${collection.name}`);
 		$('#selectedCollectionIcon').css('background-color', collection.colorCode);
 		$('#selectedCollectionName').text(collection.name);
@@ -72,24 +98,28 @@ function bindFilterEvents() {
 }
 
 function searchEvents() {
-    // 검색 버튼 클릭 시 검색 동작
-    $('#searchBtn').on('click', performSearch);
+	// 검색 버튼 클릭 시 검색 동작
+	$('#searchBtn').on('click', performSearch);
 
-    // Enter 키를 눌렀을 때도 검색 동작
-    $('input[name="keyword"]').on('keydown', function(event) {
-        if (event.key === 'Enter' || event.keyCode === 13) {
-            performSearch();
-        }
-    });
+	// Enter 키를 눌렀을 때도 검색 동작
+	$('input[name="keyword"]').on('keydown', function(event) {
+		if (event.key === 'Enter' || event.keyCode === 13) {
+			performSearch();
+		}
+	});
 }
 
 // 검색 수행 함수
 function performSearch() {
-    const path = window.location.pathname;
-    const segments = path.split('/');
-    const collectionId = segments[2] || 0;
+	currentPage = 0;
+	isLastPage = false;
+	console.log("currentPage : " + currentPage);
 
-    handleDashboardPaths(path, collectionId);
+	const path = window.location.pathname;
+	const segments = path.split('/');
+	const collectionId = segments[2] || 0;
+
+	handleDashboardPaths(path, collectionId);
 }
 
 // 모달 열기
@@ -176,6 +206,16 @@ function previewCoverImage(e) {
 	const reader = new FileReader();
 
 	if (file) {
+
+		// 파일 크기 제한
+		if (file.size > MAX_FILE_SIZE) {
+			alert('The file size exceeds the 5MB limit. Please upload a smaller file.');
+			// 파일 미리보기를 초기 이미지로 리셋
+			$('.edit-panel #coverImgPreview').attr('src', originalCoverImg);
+			return; // 함수 종료
+		}
+
+		// 파일 미리보기
 		reader.onload = function(event) {
 			$('.edit-panel #coverImgPreview').attr('src', event.target.result);
 		};
@@ -235,35 +275,55 @@ function getBookmarksByCollection(collectionId) { fetchBookmarks(`/api/v1/bookma
 
 // 북마크 데이터 요청 및 처리
 function fetchBookmarks(endpoint, collectionName) {
-	// 라디오 버튼에서 sortBy와 desc 값을 가져옴
-    const sortBy = $('input[name="sort"]:checked').val().split('-')[0]; // 정렬 필드 (예: "updated", "created", "title")
-    const desc = $('input[name="sort"]:checked').val().split('-')[1] === 'desc'; // true 또는 false 값
-    const keyword = encodeURIComponent($('input[name="keyword"]').val().trim()); // 공백과 특수 문자를 인코딩
 
-    // 쿼리스트링을 URL에 추가
-    let queryParams = `?sortBy=${sortBy}&desc=${desc}`;
-    
-    if (keyword != null && keyword != '') {
+	// 라디오 버튼에서 sortBy와 desc 값을 가져옴
+	const sortBy = $('input[name="sort"]:checked').val().split('-')[0]; // 정렬 필드 (예: "updated", "created", "title")
+	const desc = $('input[name="sort"]:checked').val().split('-')[1] === 'desc'; // true 또는 false 값
+	const keyword = encodeURIComponent($('input[name="keyword"]').val().trim()); // 공백과 특수 문자를 인코딩
+
+	// 쿼리스트링을 URL에 추가
+	let queryParams = `?page=${currentPage}&sortBy=${sortBy}&desc=${desc}`;
+
+	if (keyword != null && keyword != '') {
 		queryParams += `&keyword=${keyword}`
 	}
-    
-    let fullUrl = endpoint + queryParams;
-	
+
+	let fullUrl = endpoint + queryParams;
+
+	console.log("endpoint : " + fullUrl);
+
 	$.ajax({
 		url: fullUrl,
 		type: 'GET',
-		success: function(response) {
-			const bookmarks = response.content; // Page 객체의 content 배열에 북마크 데이터가 있음
-			
+		success: function(bookmarks) {
+			console.log("Bookmarks:", bookmarks);  // 북마크 데이터를 출력
+
 			if (bookmarks.length > 0) {
+				console.log("북마크 길이 확인");
+				currentPage++;  // 다음 페이지 번호로 업데이트
+				console.log("currentPage : " + currentPage);
+				isLoading = false;  // 로딩 상태 해제
+				
+				if (bookmarks.length < BOOKMARKS_PER_PAGE) {
+					isLastPage = true;
+				}
+
 				renderBookmarks(bookmarks);
-			} else {
+				
+			} else if (bookmarks.length == 0) {
+				isLoading = false;  // 로딩 상태 해제
+			}
+
+
+			if ($('#bookmarksList').html().trim() === "") {
 				$('#bookmarksList').html('<div>No bookmarks found in this collection.</div>'); // 북마크가 없을 때 메시지 표시
 			}
+
 			$('#selectedCollectionName').text(collectionName); // 컬렉션 이름 표시
 		},
 		error: function(xhr) {
 			console.error("Error occurred:", xhr.responseText);
+			isLoading = false;  // 에러 발생 시에도 로딩 상태 해제
 		}
 	});
 }
@@ -273,11 +333,14 @@ function renderBookmarks(bookmarks) {
 	const path = window.location.pathname;
 	const segments = path.split('/');
 	const collectionId = segments[2];
-	
+
 	const selectedLabelText = $('input[name="sort"]:checked').closest('label').text().trim();
 	$('.filter-container .filterbtn').text("Sort by " + selectedLabelText)
 
-	$('#bookmarksList').empty();
+	if (currentPage == 1) {
+		$('#bookmarksList').empty();
+	}
+
 	let output = '';
 
 	bookmarks.forEach(function(bookmark) {
@@ -337,9 +400,9 @@ function showFilterContent() {
 
 // 필터 닫기 (외부 클릭 시)
 function closeFilterOnClickOutside(e) {
-    if (!$(e.target).closest('.filter-content, .filterbtn').length) {
-        $('.filter-content').hide();
-    }
+	if (!$(e.target).closest('.filter-content, .filterbtn').length) {
+		$('.filter-content').hide();
+	}
 }
 
 // 날짜 포맷팅

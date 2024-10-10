@@ -9,6 +9,9 @@ import java.util.UUID;
 import org.springframework.web.multipart.MultipartFile;
 
 public class FileUtil {
+	
+	// 파일 크기 제한
+	private static final long MAX_FILE_SIZE = 5 * 1024 * 1024;  // 5MB
 
 	//파일 저장 유틸리티
 	public static String saveFile(MultipartFile file, Long userId, String directory) throws IOException {
@@ -16,6 +19,11 @@ public class FileUtil {
 		if (file == null || file.isEmpty()) {
 			return null;
 		}
+		
+	    // 파일 크기 제한 체크
+	    if (file.getSize() > MAX_FILE_SIZE) {
+	        throw new IOException("File size exceeds the maximum allowed limit of 5MB.");
+	    }
 		
 		String relativePath = "/images/" + userId + "/" + directory;
 
