@@ -23,7 +23,9 @@ import org.openqa.selenium.chrome.ChromeOptions;
 import org.springframework.stereotype.Component;
 
 import io.github.bonigarcia.wdm.WebDriverManager;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 @Component
 public class MetaTagParser {
 
@@ -131,20 +133,22 @@ public class MetaTagParser {
 		return bookmarkData;
 	}
 
-	public String takeScreenshot(Map<String, String> bookmarkData, String url, Long userId)
-			throws IOException {
+	public String takeScreenshot(Map<String, String> bookmarkData, String url, Long userId) throws IOException {
 		String filename;
 		String screenshotPath;
 		String relativePath;
 
 		WebDriverManager.chromedriver().setup();
+		String driverVersion = WebDriverManager.chromedriver().getDriverVersions().toString();
+		log.debug("driverVersion : " + driverVersion);
 		
-		ChromeOptions options = new ChromeOptions();
-//		options.setPageLoadStrategy(PageLoadStrategy.NORMAL);
-//		options.setExperimentalOption("debuggerAddress", "127.0.0.1:9222"); // 해당 포트로 selenium 열기
-//		options.addArguments("--headless"); // 브라우저를 숨김 모드로 실행
 
-		
+		ChromeOptions options = new ChromeOptions();
+		options.addArguments(
+			    "--user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/" + driverVersion
+			);
+		options.addArguments("--headless"); // 브라우저를 숨김 모드로 실행
+
 		WebDriver driver = new ChromeDriver(options);
 
 		try {
