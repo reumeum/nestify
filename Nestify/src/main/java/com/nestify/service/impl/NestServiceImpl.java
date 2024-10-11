@@ -272,7 +272,8 @@ public class NestServiceImpl implements NestService {
 	public Page<BookmarkDTO> searchBookmarks(Long userId, Long collectionId, String keyword, int page, int size,
 			String sortBy, boolean desc) {
 		Pageable pageable = PageRequest.of(page, size,
-				Sort.by(desc ? Sort.Direction.DESC : Sort.Direction.ASC, sortBy));
+				Sort.by(desc ? Sort.Direction.DESC : Sort.Direction.ASC, sortBy)
+				.and(Sort.by(Sort.Direction.ASC, "bookmarkId"))); // 추가 정렬 기준
 
 		// 동적 검색을 위한 Specification 생성
 		Specification<BookmarkEntity> spec = (root, query, criteriaBuilder) -> {

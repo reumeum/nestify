@@ -302,7 +302,6 @@ function fetchBookmarks(endpoint, collectionName) {
 				console.log("북마크 길이 확인");
 				currentPage++;  // 다음 페이지 번호로 업데이트
 				console.log("currentPage : " + currentPage);
-				isLoading = false;  // 로딩 상태 해제
 				
 				if (bookmarks.length < BOOKMARKS_PER_PAGE) {
 					isLastPage = true;
@@ -363,6 +362,7 @@ function renderBookmarks(bookmarks) {
 	});
 
 	$('#bookmarksList').append(output);
+	isLoading = false;  // 로딩 상태 해제
 	adjustSidebarEditPanelHeight();
 }
 
