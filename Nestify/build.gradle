@@ -18,24 +18,43 @@ repositories {
 }
 
 dependencies {
-	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
-	implementation 'org.springframework.boot:spring-boot-starter-web'
-	implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'
-	implementation 'nz.net.ultraq.thymeleaf:thymeleaf-layout-dialect:3.2.0'
-	implementation 'org.jsoup:jsoup:1.16.1'
-	implementation 'org.seleniumhq.selenium:selenium-devtools-v127:4.23.1'
-    implementation 'org.seleniumhq.selenium:selenium-chrome-driver:4.19.1'
-    implementation 'io.github.bonigarcia:webdrivermanager:5.9.2'
-    implementation 'org.springframework.boot:spring-boot-devtools:3.3.3'
-    implementation 'org.springframework.cloud:spring-cloud-starter-aws:2.2.6.RELEASE'
-    implementation 'commons-fileupload:commons-fileupload:1.4'
-    
-	compileOnly 'org.projectlombok:lombok'
-	runtimeOnly 'org.postgresql:postgresql'
-	annotationProcessor 'org.projectlombok:lombok'
-	testImplementation 'org.springframework.boot:spring-boot-starter-test'
-	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+    // Spring Boot Starters
+    implementation 'org.springframework.boot:spring-boot-starter-data-jpa'         // JPA (Database)
+    implementation 'org.springframework.boot:spring-boot-starter-web'              // Web (Spring MVC, REST API)
+    implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'        // Thymeleaf (View rendering)
+
+    // Thymeleaf extras
+    implementation 'nz.net.ultraq.thymeleaf:thymeleaf-layout-dialect:3.2.0'         // Thymeleaf Layouts
+
+    // HTML Parsing and Web Scraping
+    implementation 'org.jsoup:jsoup:1.16.1'                                         // HTML Parser (Jsoup)
+
+    // Selenium and WebDriver
+    implementation 'org.seleniumhq.selenium:selenium-devtools-v127:4.23.1'          // Selenium DevTools
+    implementation 'org.seleniumhq.selenium:selenium-chrome-driver:4.19.1'          // Selenium Chrome Driver
+    implementation 'io.github.bonigarcia:webdrivermanager:5.9.2'                    // WebDriverManager
+
+    // AWS
+    implementation 'org.springframework.cloud:spring-cloud-starter-aws:2.2.6.RELEASE' // AWS Integration (S3, etc.)
+
+    // File Upload
+    implementation 'commons-fileupload:commons-fileupload:1.4'                      // File Upload (Apache Commons)
+
+    // Developer Tools
+    implementation 'org.springframework.boot:spring-boot-devtools:3.3.3'            // DevTools (Hot reload)
+
+    // Database
+    runtimeOnly 'org.postgresql:postgresql'                                         // PostgreSQL Driver
+
+    // Lombok (Compile-time dependency)
+    compileOnly 'org.projectlombok:lombok'                                          // Lombok (for reducing boilerplate code)
+    annotationProcessor 'org.projectlombok:lombok'                                  // Lombok (Annotation Processor)
+
+    // Testing dependencies
+    testImplementation 'org.springframework.boot:spring-boot-starter-test'          // Test Starter (JUnit, Mockito, etc.)
+    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'                    // JUnit Platform Launcher
 }
+
 
 tasks.named('test') {
 	useJUnitPlatform()
