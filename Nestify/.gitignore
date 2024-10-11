@@ -37,3 +37,4 @@ out/
 .vscode/
 
 Nestify/src/main/resources/config/application-nestify-local.yml
+Nestify/src/main/resources/config/application-aws.yml
