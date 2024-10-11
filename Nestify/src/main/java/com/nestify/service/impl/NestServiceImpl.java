@@ -3,6 +3,7 @@ package com.nestify.service.impl;
 import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
@@ -27,8 +28,8 @@ import com.nestify.repository.BookmarkJpaRepository;
 import com.nestify.repository.CollectionBookmarkJpaRepository;
 import com.nestify.repository.CollectionJpaRepository;
 import com.nestify.repository.UserJpaRepository;
+import com.nestify.service.ImageUploadService;
 import com.nestify.service.NestService;
-import com.nestify.util.FileUtil;
 
 import jakarta.persistence.criteria.Join;
 import jakarta.persistence.criteria.Predicate;
@@ -46,6 +47,7 @@ public class NestServiceImpl implements NestService {
 	private final CollectionJpaRepository collectionJpaRepository;
 	private final BookmarkJpaRepository bookmarkJpaRepository;
 	private final CollectionBookmarkJpaRepository collectionBookmarkJpaRepository;
+	private final ImageUploadService imageUploadService;
 
 	/*
 	 * 사용자별 컬렉션 리스트 조회
@@ -192,10 +194,11 @@ public class NestServiceImpl implements NestService {
 
 		// 커버 이미지 처리
 		MultipartFile coverImg = bookmarkForm.getCoverImg();
-		
+
 		if (coverImg != null && !coverImg.isEmpty()) {
 			try {
-				bookmarkEntity.setCoverImgUrl(FileUtil.saveCoverImg(coverImg, user.getUserId()));
+				String fileName = user.getUserId() + "/coverImgs/" + coverImg.getOriginalFilename();
+				bookmarkEntity.setCoverImgUrl(imageUploadService.upload(coverImg, fileName));
 			} catch (IOException e) {
 				throw new RuntimeException("Failed to save cover image", e);
 			}
@@ -227,17 +230,31 @@ public class NestServiceImpl implements NestService {
 
 		// 커버이미지가 있으면 삭제
 		String coverImagePath = bookmark.getCoverImgUrl();
-		
-		if (coverImagePath != null && coverImagePath.startsWith("/images/")) {
+
+		if (coverImagePath != null
+				&& coverImagePath.startsWith("https://nestifyimagebucket.s3.ap-northeast-2.amazonaws.com")) {
 			try {
-				FileUtil.deleteFile(coverImagePath);
+				String objectKey = getSubstringAfterThirdSlash(coverImagePath);
+				imageUploadService.delete(objectKey);
+				log.debug("Image deleted from the aws bucket. [objectKey] : " + objectKey);
 			} catch (IOException e) {
 				log.error("Failed to delete cover Image: " + coverImagePath, e);
 			}
 		}
-		
+
 		// 북마크 삭제
 		bookmarkJpaRepository.delete(bookmark);
+	}
+	
+	public String getSubstringAfterThirdSlash(String url) {
+	    String[] parts = url.split("/");
+
+	    // URL에서 세 번째 슬래시 이후의 부분을 결합
+	    if (parts.length > 3) {
+	        return String.join("/", Arrays.copyOfRange(parts, 3, parts.length));
+	    }
+
+	    return null; // 세 번째 슬래시가 없는 경우 처리
 	}
 
 	@Override

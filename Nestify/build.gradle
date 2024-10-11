@@ -27,6 +27,9 @@ dependencies {
     implementation 'org.seleniumhq.selenium:selenium-chrome-driver:4.19.1'
     implementation 'io.github.bonigarcia:webdrivermanager:5.9.2'
     implementation 'org.springframework.boot:spring-boot-devtools:3.3.3'
+    implementation 'org.springframework.cloud:spring-cloud-starter-aws:2.2.6.RELEASE'
+    implementation 'commons-fileupload:commons-fileupload:1.4'
+    
 	compileOnly 'org.projectlombok:lombok'
 	runtimeOnly 'org.postgresql:postgresql'
 	annotationProcessor 'org.projectlombok:lombok'

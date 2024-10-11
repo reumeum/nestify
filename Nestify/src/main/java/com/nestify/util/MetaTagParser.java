@@ -1,10 +1,8 @@
 package com.nestify.util;
 
+import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Paths;
-import java.sql.Timestamp;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
@@ -14,20 +12,25 @@ import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.openqa.selenium.OutputType;
-import org.openqa.selenium.PageLoadStrategy;
 import org.openqa.selenium.TakesScreenshot;
 import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.WebDriver.Options;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
 import org.springframework.stereotype.Component;
+import org.springframework.web.multipart.MultipartFile;
+
+import com.nestify.service.ImageUploadService;
 
 import io.github.bonigarcia.wdm.WebDriverManager;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @Component
+@RequiredArgsConstructor
 public class MetaTagParser {
+	
+	private final ImageUploadService imageUploadService;
 
 	/**
 	 * URL로부터 메타태그를 파싱
@@ -135,8 +138,7 @@ public class MetaTagParser {
 
 	public String takeScreenshot(Map<String, String> bookmarkData, String url, Long userId) throws IOException {
 		String filename;
-		String screenshotPath;
-		String relativePath;
+		String coverImageURL;
 
 		WebDriverManager.chromedriver().setup();
 		String driverVersion = WebDriverManager.chromedriver().getDriverVersions().toString();
@@ -159,24 +161,15 @@ public class MetaTagParser {
 			File screenshot = ((TakesScreenshot) driver).getScreenshotAs(OutputType.FILE);
 			// "title" 값이 null이 아닌지 확인하여 "Untitled"로 대체
 			String title = Optional.ofNullable(bookmarkData.get("title")).orElse("Untitled");
-			filename = title.replaceAll("[^a-zA-Z0-9-_\\.]", "_") + "_"
-					+ new Timestamp(System.currentTimeMillis()).toString().replaceAll(" ", "_").replaceAll(":", "-")
-					+ ".png";
+			filename = userId + "/screenshots/" + title.replaceAll("[^a-zA-Z0-9-_\\.]", "_") + ".png";
 
-			// 스크린샷을 저장할 상대 경로 설정 (웹에서 접근 가능한 경로)
-			relativePath = "/images/" + userId + "/screenshots/" + filename;
-
-			// 절대 경로로 변환하여 파일을 저장할 경로 설정
-			screenshotPath = "src/main/resources/static" + relativePath;
-
-			// 스크린샷을 저장할 경로 설정
-			Files.createDirectories(Paths.get("src/main/resources/static/images/" + userId + "/screenshots"));
-			Files.copy(screenshot.toPath(), Paths.get(screenshotPath));
+			coverImageURL = imageUploadService.upload(screenshot, filename);
 
 		} finally {
 			driver.quit(); // 브라우저 종료
 		}
 
-		return relativePath;
+		return coverImageURL;
 	}
+	
 }
